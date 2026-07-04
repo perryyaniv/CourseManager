@@ -10,7 +10,7 @@ const ROLES: UserRole[] = ['admin', 'coordinator', 'viewer'];
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'מנהל',
-  coordinator: 'רכז',
+  coordinator: 'עורך',
   viewer: 'צופה',
 };
 

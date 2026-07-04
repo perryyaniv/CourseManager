@@ -88,7 +88,7 @@ export default function Header() {
               <div className="flex items-center gap-2 border-r border-gray-200 pr-3 mr-1">
                 <span className="text-xs text-gray-400">{user?.username}</span>
                 <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
-                  {{ admin: 'מנהל', coordinator: 'רכז', viewer: 'צופה' }[user?.role ?? 'viewer']}
+                  {{ admin: 'מנהל', coordinator: 'עורך', viewer: 'צופה' }[user?.role ?? 'viewer']}
                 </span>
                 <button
                   onClick={clearAuth}
