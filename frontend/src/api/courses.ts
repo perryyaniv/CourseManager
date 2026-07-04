@@ -21,3 +21,18 @@ export const cloneCourse = (id: string) =>
 
 export const addNote = (id: string, type: string, content: string) =>
   client.post<Course>(`/courses/${id}/notes`, { type, content }).then((r) => r.data);
+
+export interface ImportedCourse {
+  suggestedName: string;
+  sessionsCount?: number;
+  totalHours?: number;
+  timeOfDay?: string;
+  startDate?: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  locationId?: string;
+}
+
+export const importFromUrl = (url: string) =>
+  client.post<ImportedCourse>('/courses/import-url', { url }).then((r) => r.data);
