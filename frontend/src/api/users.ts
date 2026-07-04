@@ -1,0 +1,14 @@
+import client from './client';
+import { User, UserRole } from '../types';
+
+export const getUsers = () =>
+  client.get<User[]>('/users').then((r) => r.data);
+
+export const createUser = (data: { username: string; password: string; role: UserRole }) =>
+  client.post<User>('/users', data).then((r) => r.data);
+
+export const updateUser = (id: string, data: { role?: UserRole; active?: boolean }) =>
+  client.put<User>(`/users/${id}`, data).then((r) => r.data);
+
+export const resetPassword = (id: string, tempPassword: string) =>
+  client.post(`/users/${id}/reset-password`, { tempPassword }).then((r) => r.data);
