@@ -5,6 +5,7 @@ import { getCourses } from '../api/courses';
 import { Course } from '../types';
 import { StatusBadge } from '../components/ui/Badge';
 import Spinner from '../components/ui/Spinner';
+import { formatDate } from '../utils/date';
 
 function StatCard({ label, value, icon, color }: { label: string; value: number; icon: React.ReactNode; color: string }) {
   return (
@@ -18,11 +19,6 @@ function StatCard({ label, value, icon, color }: { label: string; value: number;
       </div>
     </div>
   );
-}
-
-function formatDate(d?: string) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 export default function Dashboard() {

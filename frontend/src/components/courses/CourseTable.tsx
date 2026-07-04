@@ -2,17 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Course } from '../../types';
 import { StatusBadge } from '../ui/Badge';
+import { formatDate } from '../../utils/date';
 
 interface Props {
   courses: Course[];
   sortBy: string;
   sortDir: 'asc' | 'desc';
   onSort: (field: string) => void;
-}
-
-function formatDate(d?: string) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function SortIcon({ active, dir }: { active: boolean; dir: 'asc' | 'desc' }) {

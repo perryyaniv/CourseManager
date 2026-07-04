@@ -4,6 +4,7 @@ import { ChecklistEntry } from '../../types';
 import { getCourseChecklist, toggleChecklistItem } from '../../api/checklist';
 import { useAuth } from '../../contexts/AuthContext';
 import Spinner from '../ui/Spinner';
+import { formatDate } from '../../utils/date';
 
 interface Props {
   courseId: string;
@@ -95,7 +96,7 @@ export default function Checklist({ courseId }: Props) {
               {item.checked && item.checkedByName && (
                 <p className="text-xs text-gray-400 mt-0.5">
                   {t('checklist.checkedBy')}: {item.checkedByName}
-                  {item.checkedAt && ` · ${new Date(item.checkedAt).toLocaleDateString('he-IL')}`}
+                  {item.checkedAt && ` · ${formatDate(item.checkedAt)}`}
                 </p>
               )}
             </div>

@@ -2,14 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Course } from '../../types';
 import { StatusBadge } from '../ui/Badge';
+import { formatDate } from '../../utils/date';
 
 interface Props {
   course: Course;
-}
-
-function formatDate(d?: string) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 export default function CourseCard({ course }: Props) {

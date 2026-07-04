@@ -5,6 +5,7 @@ import { User, UserRole } from '../types';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
+import { formatDate } from '../utils/date';
 
 const ROLES: UserRole[] = ['admin', 'coordinator', 'viewer'];
 
@@ -104,7 +105,7 @@ export default function UserManagement() {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-gray-500 text-xs">
-                  {new Date(u.createdAt).toLocaleDateString('he-IL')}
+                  {formatDate(u.createdAt)}
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">

@@ -13,13 +13,9 @@ import Spinner from '../components/ui/Spinner';
 import { getAuditLog } from '../api/auditLog';
 import { AuditLogEntry } from '../types';
 import { io } from 'socket.io-client';
+import { formatDate, formatDateTime } from '../utils/date';
 
 type Tab = 'details' | 'checklist' | 'history';
-
-function formatDate(d?: string) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -225,7 +221,7 @@ export default function CourseDetail() {
                       <span className="text-gray-500"> ({entry.fieldChanged}: {entry.oldValue} → {entry.newValue})</span>
                     )}
                   </p>
-                  <p className="text-xs text-gray-400 mt-0.5">{new Date(entry.timestamp).toLocaleString('he-IL')}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{formatDateTime(entry.timestamp)}</p>
                 </div>
               </div>
             ))}

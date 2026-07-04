@@ -4,6 +4,7 @@ import { getAuditLog } from '../api/auditLog';
 import { AuditLogEntry } from '../types';
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
+import { formatDateTime } from '../utils/date';
 
 export default function AuditLog() {
   const { t } = useTranslation();
@@ -75,7 +76,7 @@ export default function AuditLog() {
               {entries.map((e) => (
                 <tr key={e._id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">
-                    {new Date(e.timestamp).toLocaleString('he-IL')}
+                    {formatDateTime(e.timestamp)}
                   </td>
                   <td className="px-4 py-3 font-medium text-gray-800">{e.userName}</td>
                   <td className="px-4 py-3 text-gray-600">{e.action}</td>
