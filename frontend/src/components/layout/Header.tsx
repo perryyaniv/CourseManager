@@ -24,7 +24,7 @@ export default function Header() {
   ].filter((i) => i.show);
 
   const isActive = (to: string) =>
-    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
+    to === '/' ? location.pathname === '/' : location.pathname === to || (location.pathname.startsWith(to + '/') && !navItems.some(i => i.to !== to && i.to.startsWith(to) && location.pathname.startsWith(i.to)));
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
