@@ -13,7 +13,6 @@ const LIST_SECTIONS: ListSection[] = [
   { type: 'course-types', label: 'סוגי קורסים' },
   { type: 'lecturers', label: 'מרצים', hasDetails: true },
   { type: 'locations', label: 'מיקומים' },
-  { type: 'regions', label: 'אזורים' },
 ];
 
 function SimpleListEditor({ type }: { type: ListType; label: string }) {

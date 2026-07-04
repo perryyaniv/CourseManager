@@ -50,7 +50,6 @@ export interface Course {
   startTime?: string;
   endTime?: string;
   location?: ManagedListItem;
-  region?: ManagedListItem;
   academicYear?: string;
   numberOfStudents?: number;
   isRecognizedForCredit: boolean;

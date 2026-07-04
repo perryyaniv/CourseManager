@@ -25,7 +25,6 @@ export interface ICourse extends Document {
   startTime?: string;
   endTime?: string;
   location?: mongoose.Types.ObjectId;
-  region?: mongoose.Types.ObjectId;
   academicYear?: string;
   numberOfStudents?: number;
   isRecognizedForCredit: boolean;
@@ -59,7 +58,6 @@ const CourseSchema = new Schema<ICourse>(
     startTime: { type: String },
     endTime: { type: String },
     location: { type: Schema.Types.ObjectId, ref: 'Location' },
-    region: { type: Schema.Types.ObjectId, ref: 'Region' },
     academicYear: { type: String },
     numberOfStudents: { type: Number },
     isRecognizedForCredit: { type: Boolean, default: false },

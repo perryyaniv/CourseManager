@@ -5,7 +5,6 @@ import CourseName from '../models/CourseName';
 import CourseType from '../models/CourseType';
 import Lecturer from '../models/Lecturer';
 import Location from '../models/Location';
-import Region from '../models/Region';
 import Course from '../models/Course';
 
 const router = Router();
@@ -18,7 +17,6 @@ const listMap: Record<string, { model: AnyModel; refField?: string }> = {
   'course-types': { model: CourseType as unknown as AnyModel, refField: 'type' },
   'lecturers': { model: Lecturer as unknown as AnyModel, refField: 'lecturers' },
   'locations': { model: Location as unknown as AnyModel, refField: 'location' },
-  'regions': { model: Region as unknown as AnyModel, refField: 'region' },
 };
 
 router.get('/:listType', async (req: AuthRequest, res: Response) => {

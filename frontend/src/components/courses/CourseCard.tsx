@@ -50,9 +50,6 @@ export default function CourseCard({ course }: Props) {
 
         <div className="text-gray-400 text-xs font-medium">{t('courses.location')}</div>
         <div className="text-gray-700 text-xs truncate">{course.location?.name ?? '—'}</div>
-
-        <div className="text-gray-400 text-xs font-medium">{t('courses.region')}</div>
-        <div className="text-gray-700 text-xs">{course.region?.name ?? '—'}</div>
       </div>
 
       {course.lecturers?.length > 0 && (

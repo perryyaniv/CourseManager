@@ -1,7 +1,7 @@
 import client from './client';
 import { ManagedListItem, Lecturer } from '../types';
 
-export type ListType = 'course-names' | 'course-types' | 'lecturers' | 'locations' | 'regions';
+export type ListType = 'course-names' | 'course-types' | 'lecturers' | 'locations';
 
 export const getList = <T = ManagedListItem>(type: ListType) =>
   client.get<T[]>(`/managed-lists/${type}`).then((r) => r.data);

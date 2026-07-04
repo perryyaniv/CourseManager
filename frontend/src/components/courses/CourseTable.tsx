@@ -49,7 +49,6 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
             {th(t('courses.status'), 'status')}
             {th(t('courses.startDate'), 'startDate')}
             {th(t('courses.location'))}
-            {th(t('courses.region'))}
             {th(t('courses.academicYear'))}
             {th(t('courses.lecturers'))}
           </tr>
@@ -74,7 +73,6 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
               <td className="px-4 py-3"><StatusBadge status={course.status} /></td>
               <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{formatDate(course.startDate)}</td>
               <td className="px-4 py-3 text-gray-600">{course.location?.name ?? '—'}</td>
-              <td className="px-4 py-3 text-gray-600">{course.region?.name ?? '—'}</td>
               <td className="px-4 py-3 text-gray-600">{course.academicYear ?? '—'}</td>
               <td className="px-4 py-3 text-gray-600">
                 {course.lecturers?.map((l) => `${l.firstName} ${l.lastName}`).join(', ') || '—'}

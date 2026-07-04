@@ -4,7 +4,6 @@ import User from './models/User';
 import CourseName from './models/CourseName';
 import CourseType from './models/CourseType';
 import Location from './models/Location';
-import Region from './models/Region';
 import ChecklistItem from './models/ChecklistItem';
 
 dotenv.config();
@@ -24,12 +23,6 @@ async function seed() {
   const types = ['קורס', 'השתלמות', 'יום עיון'];
   for (const name of types) {
     await CourseType.findOneAndUpdate({ name }, { name }, { upsert: true });
-  }
-
-  // Regions
-  const regions = ['מרכז', 'צפון', 'דרום', 'שפלה', 'זום'];
-  for (const name of regions) {
-    await Region.findOneAndUpdate({ name }, { name }, { upsert: true });
   }
 
   // Sample course names

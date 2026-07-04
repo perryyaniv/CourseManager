@@ -178,7 +178,6 @@ export default function CourseDetail() {
               <DetailRow label={t('courses.startTime')} value={course.startTime} />
               <DetailRow label={t('courses.endTime')} value={course.endTime} />
               <DetailRow label={t('courses.location')} value={course.location?.name} />
-              <DetailRow label={t('courses.region')} value={course.region?.name} />
               <DetailRow label={t('courses.numberOfStudents')} value={course.numberOfStudents} />
               <DetailRow label={t('courses.isRecognizedForCredit')} value={course.isRecognizedForCredit ? 'כן' : 'לא'} />
               <DetailRow label={t('courses.fundingSource')} value={course.fundingSource} />

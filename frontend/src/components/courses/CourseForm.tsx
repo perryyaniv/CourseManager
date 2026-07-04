@@ -17,7 +17,6 @@ type FormData = {
   startTime: string;
   endTime: string;
   location: string;
-  region: string;
   academicYear: string;
   numberOfStudents: string;
   isRecognizedForCredit: boolean;
@@ -49,7 +48,6 @@ function toForm(course?: Partial<Course>): FormData {
     startTime: course?.startTime ?? '',
     endTime: course?.endTime ?? '',
     location: (course?.location as ManagedListItem)?._id ?? (course?.location as unknown as string) ?? '',
-    region: (course?.region as ManagedListItem)?._id ?? (course?.region as unknown as string) ?? '',
     academicYear: course?.academicYear ?? '',
     numberOfStudents: course?.numberOfStudents?.toString() ?? '',
     isRecognizedForCredit: course?.isRecognizedForCredit ?? false,
@@ -65,7 +63,6 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
   const [courseTypes, setCourseTypes] = useState<ManagedListItem[]>([]);
   const [lecturers, setLecturers] = useState<Lecturer[]>([]);
   const [locations, setLocations] = useState<ManagedListItem[]>([]);
-  const [regions, setRegions] = useState<ManagedListItem[]>([]);
 
   useEffect(() => {
     Promise.all([
@@ -73,13 +70,11 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
       getList('course-types'),
       getLecturers(),
       getList('locations'),
-      getList('regions'),
-    ]).then(([names, types, lecs, locs, regs]) => {
+    ]).then(([names, types, lecs, locs]) => {
       setCourseNames(names.filter((i) => i.active));
       setCourseTypes(types.filter((i) => i.active));
       setLecturers((lecs as Lecturer[]).filter((l) => l.active));
       setLocations(locs.filter((i) => i.active));
-      setRegions(regs.filter((i) => i.active));
     });
   }, []);
 
@@ -100,7 +95,6 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
       endDate: form.endDate || undefined,
       timeOfDay: form.timeOfDay || undefined,
       location: form.location || undefined,
-      region: form.region || undefined,
     };
     Object.keys(payload).forEach((k) => payload[k] === '' && delete payload[k]);
     await onSubmit(payload);
@@ -174,13 +168,6 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
           <select value={form.location} onChange={(e) => set('location', e.target.value)} className={inputCls}>
             <option value="">בחר...</option>
             {locations.map((l) => <option key={l._id} value={l._id}>{l.name}</option>)}
-          </select>
-        ))}
-
-        {field(t('courses.region'), (
-          <select value={form.region} onChange={(e) => set('region', e.target.value)} className={inputCls}>
-            <option value="">בחר...</option>
-            {regions.map((r) => <option key={r._id} value={r._id}>{r.name}</option>)}
           </select>
         ))}
 

@@ -13,7 +13,6 @@ const POPULATE = [
   { path: 'type', select: 'name' },
   { path: 'lecturers', select: 'firstName lastName phone email' },
   { path: 'location', select: 'name' },
-  { path: 'region', select: 'name' },
 ];
 
 router.get('/', async (req: AuthRequest, res: Response) => {
