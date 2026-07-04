@@ -21,7 +21,6 @@ type FormData = {
   numberOfStudents: string;
   isRecognizedForCredit: boolean;
   status: CourseStatus;
-  fundingSource: string;
 };
 
 const STATUSES: CourseStatus[] = ['בתכנון', 'פעיל', 'הושלם', 'בוטל'];
@@ -52,7 +51,6 @@ function toForm(course?: Partial<Course>): FormData {
     numberOfStudents: course?.numberOfStudents?.toString() ?? '',
     isRecognizedForCredit: course?.isRecognizedForCredit ?? false,
     status: course?.status ?? 'בתכנון',
-    fundingSource: course?.fundingSource ?? '',
   };
 }
 
@@ -179,9 +177,6 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
           <input type="number" min="0" value={form.numberOfStudents} onChange={(e) => set('numberOfStudents', e.target.value)} className={inputCls} />
         ))}
 
-        {field(t('courses.fundingSource'), (
-          <input value={form.fundingSource} onChange={(e) => set('fundingSource', e.target.value)} className={inputCls} />
-        ))}
       </div>
 
       <div>

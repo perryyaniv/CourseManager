@@ -86,7 +86,7 @@ router.put('/:id', requireRole('admin', 'coordinator'), async (req: AuthRequest,
   const updated = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate(POPULATE).lean();
 
   // Audit changed fields
-  const tracked = ['status', 'totalHours', 'sessionsCount', 'startDate', 'endDate', 'numberOfStudents', 'academicYear', 'isRecognizedForCredit', 'fundingSource'];
+  const tracked = ['status', 'totalHours', 'sessionsCount', 'startDate', 'endDate', 'numberOfStudents', 'academicYear', 'isRecognizedForCredit'];
   for (const field of tracked) {
     const oldVal = (existing as Record<string, unknown>)[field];
     const newVal = (req.body as Record<string, unknown>)[field];

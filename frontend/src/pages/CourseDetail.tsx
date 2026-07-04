@@ -180,7 +180,6 @@ export default function CourseDetail() {
               <DetailRow label={t('courses.location')} value={course.location?.name} />
               <DetailRow label={t('courses.numberOfStudents')} value={course.numberOfStudents} />
               <DetailRow label={t('courses.isRecognizedForCredit')} value={course.isRecognizedForCredit ? 'כן' : 'לא'} />
-              <DetailRow label={t('courses.fundingSource')} value={course.fundingSource} />
               <DetailRow
                 label={t('courses.lecturers')}
                 value={course.lecturers?.map((l) => `${l.firstName} ${l.lastName}`).join(', ') || undefined}

@@ -54,7 +54,6 @@ export interface Course {
   numberOfStudents?: number;
   isRecognizedForCredit: boolean;
   status: CourseStatus;
-  fundingSource?: string;
   notes: Note[];
   createdAt: string;
   updatedAt: string;

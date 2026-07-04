@@ -29,7 +29,6 @@ export interface ICourse extends Document {
   numberOfStudents?: number;
   isRecognizedForCredit: boolean;
   status: CourseStatus;
-  fundingSource?: string;
   notes: INote[];
 }
 
@@ -62,7 +61,6 @@ const CourseSchema = new Schema<ICourse>(
     numberOfStudents: { type: Number },
     isRecognizedForCredit: { type: Boolean, default: false },
     status: { type: String, enum: ['בתכנון', 'פעיל', 'הושלם', 'בוטל'], default: 'בתכנון', required: true },
-    fundingSource: { type: String },
     notes: [NoteSchema],
   },
   { timestamps: true }
