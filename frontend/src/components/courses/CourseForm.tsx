@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Course, CourseStatus, TimeOfDay, ManagedListItem, Lecturer } from '../../types';
 import { getList, getLecturers } from '../../api/managedLists';
 import Button from '../ui/Button';
+import DateInput from '../ui/DateInput';
 
 type FormData = {
   name: string;
@@ -140,11 +141,11 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
         ))}
 
         {field(t('courses.startDate'), (
-          <input type="date" value={form.startDate} onChange={(e) => set('startDate', e.target.value)} className={inputCls} />
+          <DateInput value={form.startDate} onChange={(v) => set('startDate', v)} className={inputCls + ' pl-9'} />
         ))}
 
         {field(t('courses.endDate'), (
-          <input type="date" value={form.endDate} onChange={(e) => set('endDate', e.target.value)} className={inputCls} />
+          <DateInput value={form.endDate} onChange={(v) => set('endDate', v)} className={inputCls + ' pl-9'} />
         ))}
 
         {field(t('courses.timeOfDay'), (
