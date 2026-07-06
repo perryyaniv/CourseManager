@@ -26,7 +26,7 @@ export default function CourseCard({ course }: Props) {
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {course.checklistIncomplete && (
-            <span className="text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-300 px-2 py-0.5 rounded-full flex-shrink-0">
+            <span className="text-xs font-semibold bg-red-100 text-red-600 border border-red-300 px-2 py-0.5 rounded-full flex-shrink-0">
               {t('courses.incompleteChecklist')}
             </span>
           )}

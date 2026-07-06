@@ -59,7 +59,7 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
                   {course.checklistIncomplete && (
-                    <span className="text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-300 px-1.5 py-0.5 rounded-full flex-shrink-0">!</span>
+                    <span className="text-xs font-semibold bg-red-100 text-red-600 border border-red-300 px-1.5 py-0.5 rounded-full flex-shrink-0">!</span>
                   )}
                   <span className="font-medium text-gray-900">{course.name?.name ?? '—'}</span>
                   {course.catalogueId && <span className="text-gray-400 text-xs">({course.catalogueId})</span>}
