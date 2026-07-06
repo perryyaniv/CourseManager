@@ -7,12 +7,12 @@ import { StatusBadge } from '../components/ui/Badge';
 import Spinner from '../components/ui/Spinner';
 import { formatDate } from '../utils/date';
 
-type CardColor = 'blue' | 'teal' | 'orange';
+type CardColor = 'blue' | 'teal' | 'red';
 
 const colorMap: Record<CardColor, { bg: string; text: string }> = {
-  blue:   { bg: 'bg-primary/10',   text: 'text-primary' },
-  teal:   { bg: 'bg-[#0683B1]/10', text: 'text-[#0683B1]' },
-  orange: { bg: 'bg-accent/10',    text: 'text-accent' },
+  blue: { bg: 'bg-primary/10',   text: 'text-primary' },
+  teal: { bg: 'bg-[#0683B1]/10', text: 'text-[#0683B1]' },
+  red:  { bg: 'bg-red-100',      text: 'text-red-600' },
 };
 
 function StatCard({ label, value, icon, color = 'blue' }: { label: string; value: number; icon: React.ReactNode; color?: CardColor }) {
@@ -65,7 +65,7 @@ export default function Dashboard() {
         <StatCard label={t('dashboard.upcomingCourses')} value={upcoming.length} color="teal"
           icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
         />
-        <StatCard label={t('dashboard.incompleteCourses')} value={incomplete.length} color="orange"
+        <StatCard label={t('dashboard.incompleteCourses')} value={incomplete.length} color="red"
           icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>}
         />
       </div>
