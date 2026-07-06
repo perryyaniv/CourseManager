@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="#324DB7"/>
+
+  <!-- Dark maroon square (top-right, largest) -->
+  <rect x="36" y="7" width="17" height="17" rx="2" fill="#8C1C13"/>
+
+  <!-- Orange squares (mid diagonal) -->
+  <rect x="26" y="15" width="11" height="11" rx="2" fill="#CC5500"/>
+  <rect x="38" y="26" width="9" height="9" rx="2" fill="#D45A1B"/>
+
+  <!-- Yellow-orange squares (lower) -->
+  <rect x="20" y="24" width="8" height="8" rx="1.5" fill="#E8921A"/>
+  <rect x="30" y="34" width="7" height="7" rx="1.5" fill="#E8A020"/>
+  <rect x="40" y="37" width="5" height="5" rx="1" fill="#CC5500"/>
+
+  <!-- Small accent squares -->
+  <rect x="22" y="34" width="5" height="5" rx="1" fill="#E8B030"/>
+  <rect x="32" y="43" width="4" height="4" rx="1" fill="#E8A020"/>
+
+  <!-- Blue diagonal swoosh -->
+  <path d="M6 56 Q20 36 44 10" stroke="#7BAAB8" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+</svg>
