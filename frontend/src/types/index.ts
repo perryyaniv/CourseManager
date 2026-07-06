@@ -74,6 +74,7 @@ export interface ChecklistItem {
   label: string;
   order: number;
   active: boolean;
+  applicableStatuses: CourseStatus[];
 }
 
 export interface AuditLogEntry {

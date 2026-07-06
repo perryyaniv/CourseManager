@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getList, createItem, updateItem, deleteItem, ListType } from '../api/managedLists';
 import { getChecklistItems, createChecklistItem, updateChecklistItem, deleteChecklistItem, reorderChecklistItems } from '../api/checklist';
-import { ManagedListItem, Lecturer, ChecklistItem } from '../types';
+import { ManagedListItem, Lecturer, ChecklistItem, CourseStatus } from '../types';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 
@@ -191,6 +191,16 @@ function ChecklistEditor() {
     setItems((prev) => prev.filter((i) => i._id !== id));
   };
 
+  const handleToggleStatus = async (item: ChecklistItem, status: CourseStatus) => {
+    const current = item.applicableStatuses ?? [];
+    const updated = current.includes(status)
+      ? current.filter((s) => s !== status)
+      : [...current, status];
+    if (updated.length === 0) return; // must keep at least one
+    const savedItem = await updateChecklistItem(item._id, { applicableStatuses: updated } as Partial<ChecklistItem>);
+    setItems((prev) => prev.map((i) => i._id === item._id ? savedItem : i));
+  };
+
   const handleDragStart = (index: number) => { dragIndex.current = index; };
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
@@ -238,28 +248,51 @@ function ChecklistEditor() {
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDrop={handleDrop}
-            className="flex items-center justify-between py-2.5 px-3 rounded-md border border-gray-100 bg-white hover:border-primary/20 hover:bg-primary/5 cursor-grab active:cursor-grabbing group transition-colors"
+            className="flex flex-col sm:flex-row sm:items-center gap-2 py-2.5 px-3 rounded-md border border-gray-100 bg-white hover:border-primary/20 hover:bg-primary/5 cursor-grab active:cursor-grabbing group transition-colors"
           >
-            <div className="flex items-center gap-3">
-              {/* Drag handle */}
+            {/* Label row */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
               <svg className="w-4 h-4 text-gray-300 group-hover:text-primary/40 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <circle cx="7" cy="5" r="1.5"/><circle cx="13" cy="5" r="1.5"/>
                 <circle cx="7" cy="10" r="1.5"/><circle cx="13" cy="10" r="1.5"/>
                 <circle cx="7" cy="15" r="1.5"/><circle cx="13" cy="15" r="1.5"/>
               </svg>
-              <span className="text-xs text-gray-300 w-5 text-center">{index + 1}</span>
-              <span className={`text-sm font-medium ${item.active ? 'text-gray-800' : 'text-gray-400 line-through'}`}>
+              <span className="text-xs text-gray-300 w-5 text-center flex-shrink-0">{index + 1}</span>
+              <span className={`text-sm font-medium truncate ${item.active ? 'text-gray-800' : 'text-gray-400 line-through'}`}>
                 {item.label}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button onClick={() => handleToggle(item)} className="text-xs text-gray-500 hover:text-primary px-2 py-1 rounded hover:bg-gray-100">
-                {item.active ? 'השבת' : 'הפעל'}
-              </button>
-              <button onClick={() => handleDelete(item._id)} className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50">
-                {t('common.delete')}
-              </button>
+            {/* Status chips + actions */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {(['בתכנון', 'פעיל', 'הושלם', 'בוטל'] as CourseStatus[]).map((status) => {
+                const active = (item.applicableStatuses ?? []).includes(status);
+                const colors: Record<CourseStatus, string> = {
+                  'בתכנון': active ? 'bg-blue-100 text-blue-700 border-blue-300' : 'bg-gray-50 text-gray-300 border-gray-200',
+                  'פעיל':   active ? 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-50 text-gray-300 border-gray-200',
+                  'הושלם':  active ? 'bg-gray-200 text-gray-600 border-gray-300' : 'bg-gray-50 text-gray-300 border-gray-200',
+                  'בוטל':   active ? 'bg-red-100 text-red-600 border-red-300' : 'bg-gray-50 text-gray-300 border-gray-200',
+                };
+                return (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(item, status); }}
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full border transition-colors cursor-pointer ${colors[status]}`}
+                  >
+                    {status}
+                  </button>
+                );
+              })}
+
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity mr-1">
+                <button onClick={() => handleToggle(item)} className="text-xs text-gray-500 hover:text-primary px-2 py-1 rounded hover:bg-gray-100">
+                  {item.active ? 'השבת' : 'הפעל'}
+                </button>
+                <button onClick={() => handleDelete(item._id)} className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50">
+                  {t('common.delete')}
+                </button>
+              </div>
             </div>
           </div>
         ))}

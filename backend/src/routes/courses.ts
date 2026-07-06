@@ -57,19 +57,23 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     .limit(limitNum)
     .lean();
 
-  // Attach checklistIncomplete flag:
-  // A course is complete only if it has a checked=true state for every active checklist item.
-  const totalActiveItems = await ChecklistItem.countDocuments({ active: true });
+  // Attach checklistIncomplete flag — only count items applicable to each course's status
+  const allActiveItems = await ChecklistItem.find({ active: true }).select('applicableStatuses').lean();
   const courseIds = courses.map((c) => c._id);
   const checkedCounts = await ChecklistState.aggregate([
     { $match: { courseId: { $in: courseIds }, checked: true } },
     { $group: { _id: '$courseId', count: { $sum: 1 } } },
   ]);
   const checkedMap = new Map(checkedCounts.map((c) => [c._id.toString(), c.count as number]));
-  const result = courses.map((c) => ({
-    ...c,
-    checklistIncomplete: totalActiveItems > 0 && (checkedMap.get(c._id.toString()) ?? 0) < totalActiveItems,
-  }));
+  const result = courses.map((c) => {
+    const applicableCount = allActiveItems.filter((i) =>
+      (i.applicableStatuses as string[]).includes(c.status as string)
+    ).length;
+    return {
+      ...c,
+      checklistIncomplete: applicableCount > 0 && (checkedMap.get(c._id.toString()) ?? 0) < applicableCount,
+    };
+  });
 
   res.json({ data: result, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
 });
