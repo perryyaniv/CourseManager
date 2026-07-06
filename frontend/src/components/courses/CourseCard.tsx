@@ -26,7 +26,9 @@ export default function CourseCard({ course }: Props) {
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {course.checklistIncomplete && (
-            <span title={t('courses.incompleteChecklist')} className="w-2 h-2 rounded-full bg-accent flex-shrink-0" />
+            <span className="text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-300 px-2 py-0.5 rounded-full flex-shrink-0">
+              {t('courses.incompleteChecklist')}
+            </span>
           )}
           <StatusBadge status={course.status} />
         </div>

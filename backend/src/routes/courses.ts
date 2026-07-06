@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import Course, { ICourse } from '../models/Course';
 import ChecklistState from '../models/ChecklistState';
+import ChecklistItem from '../models/ChecklistItem';
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import { logAudit } from '../utils/auditLogger';
 import { Server } from 'socket.io';
@@ -56,11 +57,19 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     .limit(limitNum)
     .lean();
 
-  // Attach checklistIncomplete flag
+  // Attach checklistIncomplete flag:
+  // A course is complete only if it has a checked=true state for every active checklist item.
+  const totalActiveItems = await ChecklistItem.countDocuments({ active: true });
   const courseIds = courses.map((c) => c._id);
-  const states = await ChecklistState.find({ courseId: { $in: courseIds }, checked: false }).select('courseId').lean();
-  const incompleteIds = new Set(states.map((s) => s.courseId.toString()));
-  const result = courses.map((c) => ({ ...c, checklistIncomplete: incompleteIds.has(c._id.toString()) }));
+  const checkedCounts = await ChecklistState.aggregate([
+    { $match: { courseId: { $in: courseIds }, checked: true } },
+    { $group: { _id: '$courseId', count: { $sum: 1 } } },
+  ]);
+  const checkedMap = new Map(checkedCounts.map((c) => [c._id.toString(), c.count as number]));
+  const result = courses.map((c) => ({
+    ...c,
+    checklistIncomplete: totalActiveItems > 0 && (checkedMap.get(c._id.toString()) ?? 0) < totalActiveItems,
+  }));
 
   res.json({ data: result, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
 });
