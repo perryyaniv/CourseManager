@@ -13,6 +13,9 @@ export const updateChecklistItem = (id: string, data: Partial<ChecklistItem>) =>
 export const deleteChecklistItem = (id: string) =>
   client.delete(`/checklist/items/${id}`).then((r) => r.data);
 
+export const reorderChecklistItems = (items: { id: string; order: number }[]) =>
+  client.post('/checklist/items/reorder', { items }).then((r) => r.data);
+
 export const getCourseChecklist = (courseId: string) =>
   client.get<ChecklistEntry[]>(`/checklist/course/${courseId}`).then((r) => r.data);
 

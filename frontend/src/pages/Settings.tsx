@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getList, createItem, updateItem, deleteItem, ListType } from '../api/managedLists';
-import { getChecklistItems, createChecklistItem, updateChecklistItem, deleteChecklistItem } from '../api/checklist';
+import { getChecklistItems, createChecklistItem, updateChecklistItem, deleteChecklistItem, reorderChecklistItems } from '../api/checklist';
 import { ManagedListItem, Lecturer, ChecklistItem } from '../types';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
@@ -165,6 +165,8 @@ function ChecklistEditor() {
   const [loading, setLoading] = useState(true);
   const [newLabel, setNewLabel] = useState('');
   const [adding, setAdding] = useState(false);
+  const dragIndex = { current: -1 };
+  const dragOverIndex = { current: -1 };
 
   useEffect(() => {
     getChecklistItems().then(setItems).finally(() => setLoading(false));
@@ -189,6 +191,28 @@ function ChecklistEditor() {
     setItems((prev) => prev.filter((i) => i._id !== id));
   };
 
+  const handleDragStart = (index: number) => { dragIndex.current = index; };
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    dragOverIndex.current = index;
+  };
+
+  const handleDrop = async () => {
+    const from = dragIndex.current;
+    const to = dragOverIndex.current;
+    if (from === -1 || to === -1 || from === to) return;
+
+    const reordered = [...items];
+    const [moved] = reordered.splice(from, 1);
+    reordered.splice(to, 0, moved);
+    const withOrder = reordered.map((item, idx) => ({ ...item, order: idx + 1 }));
+    setItems(withOrder);
+    dragIndex.current = -1;
+    dragOverIndex.current = -1;
+
+    await reorderChecklistItems(withOrder.map((i) => ({ id: i._id, order: i.order })));
+  };
+
   if (loading) return <Spinner size="sm" />;
 
   return (
@@ -199,17 +223,36 @@ function ChecklistEditor() {
           onChange={(e) => setNewLabel(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           placeholder={t('settings.itemName')}
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="input flex-1"
         />
         <Button size="sm" loading={adding} onClick={handleAdd}>{t('common.add')}</Button>
       </div>
+
+      <p className="text-xs text-gray-400">גרור פריטים לשינוי סדר</p>
+
       <div className="space-y-1">
-        {items.map((item) => (
-          <div key={item._id} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 group">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 w-6">{item.order}</span>
-              <span className={`text-sm ${item.active ? 'text-gray-800' : 'text-gray-400 line-through'}`}>{item.label}</span>
+        {items.map((item, index) => (
+          <div
+            key={item._id}
+            draggable
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDrop={handleDrop}
+            className="flex items-center justify-between py-2.5 px-3 rounded-md border border-gray-100 bg-white hover:border-primary/20 hover:bg-primary/5 cursor-grab active:cursor-grabbing group transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              {/* Drag handle */}
+              <svg className="w-4 h-4 text-gray-300 group-hover:text-primary/40 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <circle cx="7" cy="5" r="1.5"/><circle cx="13" cy="5" r="1.5"/>
+                <circle cx="7" cy="10" r="1.5"/><circle cx="13" cy="10" r="1.5"/>
+                <circle cx="7" cy="15" r="1.5"/><circle cx="13" cy="15" r="1.5"/>
+              </svg>
+              <span className="text-xs text-gray-300 w-5 text-center">{index + 1}</span>
+              <span className={`text-sm font-medium ${item.active ? 'text-gray-800' : 'text-gray-400 line-through'}`}>
+                {item.label}
+              </span>
             </div>
+
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button onClick={() => handleToggle(item)} className="text-xs text-gray-500 hover:text-primary px-2 py-1 rounded hover:bg-gray-100">
                 {item.active ? 'השבת' : 'הפעל'}

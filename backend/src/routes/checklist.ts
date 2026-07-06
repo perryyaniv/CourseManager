@@ -17,6 +17,13 @@ router.post('/items', requireRole('admin'), async (req: AuthRequest, res: Respon
   res.status(201).json(item);
 });
 
+router.post('/items/reorder', requireRole('admin'), async (req: AuthRequest, res: Response) => {
+  const { items } = req.body as { items: { id: string; order: number }[] };
+  if (!Array.isArray(items)) { res.status(400).json({ message: 'items array required' }); return; }
+  await Promise.all(items.map(({ id, order }) => ChecklistItem.findByIdAndUpdate(id, { order })));
+  res.json({ message: 'Reordered' });
+});
+
 router.put('/items/:id', requireRole('admin'), async (req: AuthRequest, res: Response) => {
   const item = await ChecklistItem.findByIdAndUpdate(req.params.id, req.body, { new: true });
   if (!item) { res.status(404).json({ message: 'Not found' }); return; }
