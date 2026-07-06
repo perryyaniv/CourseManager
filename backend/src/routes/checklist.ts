@@ -37,16 +37,12 @@ router.delete('/items/:id', requireRole('admin'), async (req: AuthRequest, res: 
   res.json({ message: 'Deleted' });
 });
 
-// Per-course checklist state — filtered by course status
+// Per-course checklist — all active items, grouped by applicableStatuses, with course status context
 router.get('/course/:courseId', async (req: AuthRequest, res: Response) => {
   const course = await Course.findById(req.params.courseId).select('status').lean();
   if (!course) { res.status(404).json({ message: 'Course not found' }); return; }
 
-  const items = await ChecklistItem.find({
-    active: true,
-    applicableStatuses: course.status,
-  }).sort({ order: 1, createdAt: 1 });
-
+  const items = await ChecklistItem.find({ active: true }).sort({ order: 1, createdAt: 1 });
   const states = await ChecklistState.find({ courseId: req.params.courseId });
   const stateMap = new Map(states.map((s) => [s.itemId.toString(), s]));
 
@@ -62,7 +58,8 @@ router.get('/course/:courseId', async (req: AuthRequest, res: Response) => {
       checkedAt: state?.checkedAt,
     };
   });
-  res.json(result);
+
+  res.json({ items: result, courseStatus: course.status });
 });
 
 router.patch('/course/:courseId/:itemId', requireRole('admin', 'coordinator'), async (req: AuthRequest, res: Response) => {

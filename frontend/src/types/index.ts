@@ -64,6 +64,7 @@ export interface ChecklistEntry {
   _id: string;
   label: string;
   order: number;
+  applicableStatuses: CourseStatus[];
   checked: boolean;
   checkedByName?: string;
   checkedAt?: string;
