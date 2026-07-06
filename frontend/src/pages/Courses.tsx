@@ -68,10 +68,10 @@ export default function Courses() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">{t('courses.title')}</h1>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <h1 className="text-xl font-bold text-dark">{t('courses.title')}</h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
             <button
               onClick={() => setView('cards')}
               className={`px-3 py-1.5 text-sm transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}

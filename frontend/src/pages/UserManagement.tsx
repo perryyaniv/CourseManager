@@ -75,8 +75,9 @@ export default function UserManagement() {
         <Button size="sm" onClick={() => setAddModal(true)}>+ {t('users.addUser')}</Button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[560px]">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">{t('users.username')}</th>
@@ -125,6 +126,7 @@ export default function UserManagement() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       <Modal open={addModal} onClose={() => setAddModal(false)} title={t('users.addUser')} size="sm">

@@ -25,9 +25,9 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const th = (label: string, field?: string) => (
+  const th = (label: string, field?: string, extra = '') => (
     <th
-      className={`px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide ${field ? 'cursor-pointer hover:text-gray-800 select-none' : ''}`}
+      className={`px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide ${field ? 'cursor-pointer hover:text-gray-800 select-none' : ''} ${extra}`}
       onClick={field ? () => onSort(field) : undefined}
     >
       {field && <SortIcon active={sortBy === field} dir={sortDir} />}
@@ -41,12 +41,12 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
         <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
             {th(t('courses.courseName'), 'courseName')}
-            {th(t('courses.type'))}
+            {th(t('courses.type'), undefined, 'hidden sm:table-cell')}
             {th(t('courses.status'), 'status')}
-            {th(t('courses.startDate'), 'startDate')}
-            {th(t('courses.location'))}
-            {th(t('courses.academicYear'))}
-            {th(t('courses.lecturers'))}
+            {th(t('courses.startDate'), 'startDate', 'hidden sm:table-cell')}
+            {th(t('courses.location'), undefined, 'hidden md:table-cell')}
+            {th(t('courses.academicYear'), undefined, 'hidden md:table-cell')}
+            {th(t('courses.lecturers'), undefined, 'hidden lg:table-cell')}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -65,12 +65,12 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
                   {course.catalogueId && <span className="text-gray-400 text-xs">({course.catalogueId})</span>}
                 </div>
               </td>
-              <td className="px-4 py-3 text-gray-600">{course.type?.name ?? '—'}</td>
+              <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{course.type?.name ?? '—'}</td>
               <td className="px-4 py-3"><StatusBadge status={course.status} /></td>
-              <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{formatDate(course.startDate)}</td>
-              <td className="px-4 py-3 text-gray-600">{course.location?.name ?? '—'}</td>
-              <td className="px-4 py-3 text-gray-600">{course.academicYear ?? '—'}</td>
-              <td className="px-4 py-3 text-gray-600">
+              <td className="px-4 py-3 text-gray-600 whitespace-nowrap hidden sm:table-cell">{formatDate(course.startDate)}</td>
+              <td className="px-4 py-3 text-gray-600 hidden md:table-cell">{course.location?.name ?? '—'}</td>
+              <td className="px-4 py-3 text-gray-600 hidden md:table-cell">{course.academicYear ?? '—'}</td>
+              <td className="px-4 py-3 text-gray-600 hidden lg:table-cell">
                 {course.lecturers?.map((l) => `${l.firstName} ${l.lastName}`).join(', ') || '—'}
               </td>
             </tr>
