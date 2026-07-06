@@ -11,17 +11,17 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-primary text-white hover:bg-primary-dark active:bg-primary-dark shadow-sm',
-  secondary: 'bg-white text-primary border border-primary hover:bg-red-50',
-  accent: 'bg-accent text-white hover:bg-accent-dark shadow-sm',
-  danger: 'bg-red-600 text-white hover:bg-red-700',
-  ghost: 'text-gray-600 hover:bg-gray-100',
+  primary:   'bg-primary text-white hover:bg-primary-dark focus:ring-primary',
+  secondary: 'bg-white text-primary border border-primary hover:bg-primary hover:text-white focus:ring-primary',
+  accent:    'bg-accent text-white hover:bg-accent-dark focus:ring-accent',
+  danger:    'text-red-500 bg-transparent hover:text-red-700 hover:bg-red-50 focus:ring-red-400',
+  ghost:     'text-gray-600 bg-transparent hover:bg-gray-100 focus:ring-gray-300',
 };
 
 const sizeClasses: Record<Size, string> = {
   sm: 'px-3 py-1.5 text-sm',
   md: 'px-4 py-2 text-sm',
-  lg: 'px-6 py-2.5 text-base',
+  lg: 'px-5 py-2.5 text-base',
 };
 
 export default function Button({ variant = 'primary', size = 'md', loading, children, disabled, className = '', ...props }: Props) {
@@ -29,7 +29,10 @@ export default function Button({ variant = 'primary', size = 'md', loading, chil
     <button
       {...props}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors
+        focus:outline-none focus:ring-2 focus:ring-offset-1
+        disabled:opacity-50 disabled:cursor-not-allowed
+        ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
     >
       {loading && (
         <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">

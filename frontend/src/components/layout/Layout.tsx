@@ -8,10 +8,10 @@ export default function Layout() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <Outlet />
       </main>
-      <footer className="mt-12 border-t border-gray-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <img src="/logo.png" alt="לוגו" className="h-8 w-auto opacity-60" />
-          <p className="text-xs text-gray-400">© {new Date().getFullYear()} המכון הבינלאומי למנהיגות</p>
+      <footer className="mt-12 border-t border-gray-200 bg-primary/95">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          <img src="/logo.png" alt="לוגו" className="h-7 w-auto bg-white rounded p-1 opacity-90" />
+          <p className="text-xs text-white/60">© {new Date().getFullYear()} המכון הבינלאומי למנהיגות</p>
         </div>
       </footer>
     </div>

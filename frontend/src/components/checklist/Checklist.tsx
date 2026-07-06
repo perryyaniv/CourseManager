@@ -50,7 +50,7 @@ export default function Checklist({ courseId }: Props) {
             className="h-2 rounded-full transition-all duration-500"
             style={{
               width: `${pct}%`,
-              background: pct === 100 ? '#16A34A' : 'linear-gradient(to left, #8C1C13, #D45A1B)',
+              background: pct === 100 ? '#16A34A' : '#324DB7',
             }}
           />
         </div>

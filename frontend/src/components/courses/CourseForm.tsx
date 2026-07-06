@@ -99,10 +99,9 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
     await onSubmit(payload);
   };
 
-  const inputCls = 'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1';
+  const inputCls = 'input';
   const field = (label: string, children: React.ReactNode) => (
-    <div><label className={labelCls}>{label}</label>{children}</div>
+    <div><label className="label">{label}</label>{children}</div>
   );
 
   return (
@@ -181,8 +180,8 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
       </div>
 
       <div>
-        <label className={labelCls}>{t('courses.lecturers')}</label>
-        <div className="flex flex-wrap gap-2 border border-gray-200 rounded-lg p-3 bg-white min-h-[2.5rem]">
+        <label className="label">{t('courses.lecturers')}</label>
+        <div className="flex flex-wrap gap-2 border border-gray-300 rounded-md p-3 bg-white min-h-[2.5rem]">
           {lecturers.map((l) => (
             <button
               type="button"

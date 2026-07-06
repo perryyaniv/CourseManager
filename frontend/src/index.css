@@ -3,34 +3,66 @@
 @tailwind utilities;
 
 @layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
   html {
     direction: rtl;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Assistant', system-ui, sans-serif;
   }
 
   body {
-    @apply bg-bg text-gray-900 antialiased;
-    min-height: 100vh;
+    @apply bg-bg text-dark antialiased;
+    -webkit-font-smoothing: antialiased;
   }
 
-  * {
-    box-sizing: border-box;
-  }
-
-  input, select, textarea {
-    direction: rtl;
-  }
+  input, select, textarea { direction: rtl; }
+  input[type="number"], input[type="time"] { direction: ltr; }
 }
 
 @layer components {
-  .nav-link {
-    @apply relative px-1 py-1 text-sm font-medium text-gray-700 hover:text-primary transition-colors;
+  .card {
+    @apply bg-white border border-gray-200 border-r-4 border-r-primary rounded-lg shadow-card p-5;
   }
-  .nav-link.active {
-    @apply text-primary;
+
+  .label {
+    @apply block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1;
   }
-  .nav-link.active::after {
-    content: '';
-    @apply absolute bottom-0 right-0 left-0 h-0.5 bg-primary rounded-full;
+
+  .input {
+    @apply w-full bg-white border border-gray-300 text-gray-800 text-sm font-medium
+           px-3 py-2 rounded-md transition-colors
+           focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
+  }
+
+  .section-title {
+    @apply flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider mb-4;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-semibold
+           bg-primary text-white transition-colors
+           hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+           border border-primary text-primary bg-transparent transition-colors
+           hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+           text-white bg-transparent border border-white/40 transition-colors
+           hover:bg-white/15 hover:border-white/70
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+           text-red-500 bg-transparent transition-colors
+           hover:text-red-700 hover:bg-red-50
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
 }
