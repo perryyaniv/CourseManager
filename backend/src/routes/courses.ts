@@ -58,6 +58,8 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     .lean();
 
   // Attach checklistIncomplete flag — only count items applicable to each course's status
+  // Note: use ?? ALL_STATUSES fallback for legacy docs that predate the applicableStatuses field
+  const ALL_STATUSES = ['בתכנון', 'פעיל', 'הושלם', 'בוטל'];
   const allActiveItems = await ChecklistItem.find({ active: true }).select('applicableStatuses').lean();
   const courseIds = courses.map((c) => c._id);
   const checkedCounts = await ChecklistState.aggregate([
@@ -67,7 +69,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
   const checkedMap = new Map(checkedCounts.map((c) => [c._id.toString(), c.count as number]));
   const result = courses.map((c) => {
     const applicableCount = allActiveItems.filter((i) =>
-      (i.applicableStatuses as string[]).includes(c.status as string)
+      ((i.applicableStatuses as string[] | undefined) ?? ALL_STATUSES).includes(c.status as string)
     ).length;
     return {
       ...c,
