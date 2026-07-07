@@ -40,8 +40,8 @@ export default function Login() {
               <img src="/logo.png" alt="לוגו" className="h-10 w-auto" />
             </div>
             <div>
-              <h1 className="text-white font-bold text-lg leading-tight">CourseManager</h1>
-              <p className="text-white/60 text-xs">מערכת ניהול קורסים</p>
+              <h1 className="text-white font-bold text-xl leading-tight">Course Manager</h1>
+              <p className="text-white/80 text-sm font-medium">מערכת לניהול קורסים</p>
             </div>
           </div>
           {/* Accent line */}
