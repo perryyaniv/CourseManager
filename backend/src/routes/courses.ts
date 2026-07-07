@@ -145,4 +145,24 @@ router.post('/:id/notes', requireRole('admin', 'coordinator'), async (req: AuthR
   res.json(course);
 });
 
+router.delete('/:id/notes/:noteId', requireRole('admin', 'coordinator'), async (req: AuthRequest, res: Response) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) { res.status(404).json({ message: 'Not found' }); return; }
+
+  const note = course.notes.find((n) => n._id.toString() === req.params.noteId);
+  if (!note) { res.status(404).json({ message: 'Note not found' }); return; }
+
+  if (req.user!.role !== 'admin' && note.author.toString() !== req.user!.userId) {
+    res.status(403).json({ message: 'Forbidden' }); return;
+  }
+
+  const updated = await Course.findByIdAndUpdate(
+    req.params.id,
+    { $pull: { notes: { _id: req.params.noteId } } },
+    { new: true }
+  ).populate(POPULATE).lean();
+
+  res.json(updated);
+});
+
 export default router;

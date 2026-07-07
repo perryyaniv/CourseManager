@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getCourse, updateCourse, deleteCourse, cloneCourse, addNote } from '../api/courses';
+import { getCourse, updateCourse, deleteCourse, cloneCourse, addNote, deleteNote } from '../api/courses';
 import { Course } from '../types';
 import { StatusBadge } from '../components/ui/Badge';
 import CourseForm from '../components/courses/CourseForm';
@@ -96,6 +96,12 @@ export default function CourseDetail() {
     setNoteModal(false);
     setNoteContent('');
     setNoteType('regular');
+  };
+
+  const handleDeleteNote = async (noteId: string) => {
+    if (!id) return;
+    const updated = await deleteNote(id, noteId);
+    setCourse(updated);
   };
 
   if (loading) return <Spinner />;
@@ -198,12 +204,28 @@ export default function CourseDetail() {
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="section-title">{t('courses.notes')}</p>
                   <div className="space-y-2">
-                    {course.notes.map((n) => (
-                      <div key={n._id} className={`p-3 rounded-md text-sm ${n.type === 'important' ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50 border border-gray-100'}`}>
-                        <p className="text-gray-800">{n.content}</p>
-                        <p className="text-xs text-gray-400 mt-1">{n.authorName} · {formatDate(n.createdAt)}</p>
-                      </div>
-                    ))}
+                    {course.notes.map((n) => {
+                      const canDeleteNote = isAdmin || n.author === user?._id;
+                      return (
+                        <div key={n._id} className={`p-3 rounded-md text-sm group ${n.type === 'important' ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50 border border-gray-100'}`}>
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-gray-800 flex-1">{n.content}</p>
+                            {canDeleteNote && (
+                              <button
+                                onClick={() => handleDeleteNote(n._id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-red-500 flex-shrink-0 p-0.5 rounded"
+                                title="מחק הערה"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1">{n.authorName} · {formatDate(n.createdAt)}</p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
