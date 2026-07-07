@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCourses } from '../api/courses';
 import { Course } from '../types';
 import { StatusBadge } from '../components/ui/Badge';
 import Spinner from '../components/ui/Spinner';
 import { formatDate } from '../utils/date';
+import { useAuth } from '../contexts/AuthContext';
+import Button from '../components/ui/Button';
 
 type CardColor = 'blue' | 'teal' | 'red';
 
@@ -34,6 +36,9 @@ function StatCard({ label, value, icon, color = 'blue' }: { label: string; value
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isCoordinator = user?.role === 'coordinator' || user?.role === 'admin';
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +57,14 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-xl font-bold text-dark">{t('dashboard.title')}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-dark">{t('dashboard.title')}</h1>
+        {isCoordinator && (
+          <Button onClick={() => navigate('/courses/new')} size="sm">
+            + {t('nav.addCourse')}
+          </Button>
+        )}
+      </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

@@ -19,6 +19,12 @@
   input[type="number"], input[type="time"] { direction: ltr; }
 }
 
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.2s ease-out; }
+
 @layer components {
   .card {
     @apply bg-white border border-gray-200 border-r-4 border-r-primary rounded-lg shadow-card p-5;

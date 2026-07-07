@@ -7,6 +7,7 @@ import { StatusBadge } from '../components/ui/Badge';
 import CourseForm from '../components/courses/CourseForm';
 import Checklist from '../components/checklist/Checklist';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
@@ -43,6 +44,7 @@ export default function CourseDetail() {
   const [history, setHistory] = useState<AuditLogEntry[]>([]);
   const [liveAlert, setLiveAlert] = useState('');
 
+  const { showToast } = useToast();
   const canEdit = user?.role === 'admin' || user?.role === 'coordinator';
   const isAdmin = user?.role === 'admin';
 
@@ -72,6 +74,7 @@ export default function CourseDetail() {
       const updated = await updateCourse(id, data);
       setCourse(updated);
       setEditing(false);
+      showToast('הקורס נשמר בהצלחה', 'success');
     } finally {
       setSaving(false);
     }

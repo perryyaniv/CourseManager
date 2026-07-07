@@ -4,7 +4,34 @@ import { getAuditLog } from '../api/auditLog';
 import { AuditLogEntry } from '../types';
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
-import { formatDateTime } from '../utils/date';
+import { formatDate, formatDateTime } from '../utils/date';
+
+const FIELD_LABELS: Record<string, string> = {
+  status: 'סטטוס',
+  totalHours: 'סה"כ שעות',
+  sessionsCount: 'מספר מפגשים',
+  startDate: 'תאריך התחלה',
+  endDate: 'תאריך סיום',
+  numberOfStudents: 'מספר משתתפים',
+  academicYear: 'שנה אקדמית',
+  isRecognizedForCredit: 'מוכר לגמול',
+  name: 'שם הקורס',
+  type: 'סוג',
+  location: 'מיקום',
+  timeOfDay: 'שעת יום',
+  startTime: 'שעת התחלה',
+  endTime: 'שעת סיום',
+};
+
+function formatFieldValue(field: string, value?: string): string {
+  if (!value || value === 'undefined' || value === 'null') return '—';
+  if (field === 'isRecognizedForCredit') return value === 'true' ? 'כן' : 'לא';
+  if (field === 'startDate' || field === 'endDate') {
+    const d = new Date(value);
+    if (!isNaN(d.getTime())) return formatDate(d);
+  }
+  return value;
+}
 
 export default function AuditLog() {
   const { t } = useTranslation();
@@ -81,9 +108,9 @@ export default function AuditLog() {
                   </td>
                   <td className="px-4 py-3 font-medium text-gray-800">{e.userName}</td>
                   <td className="px-4 py-3 text-gray-600">{e.action}</td>
-                  <td className="px-4 py-3 text-gray-500">{e.fieldChanged ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-500 max-w-[120px] truncate">{e.oldValue ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-700 max-w-[120px] truncate">{e.newValue ?? '—'}</td>
+                  <td className="px-4 py-3 text-gray-500">{e.fieldChanged ? (FIELD_LABELS[e.fieldChanged] ?? e.fieldChanged) : '—'}</td>
+                  <td className="px-4 py-3 text-gray-500 max-w-[120px] truncate">{formatFieldValue(e.fieldChanged ?? '', e.oldValue)}</td>
+                  <td className="px-4 py-3 text-gray-700 max-w-[120px] truncate">{formatFieldValue(e.fieldChanged ?? '', e.newValue)}</td>
                 </tr>
               ))}
               {entries.length === 0 && (

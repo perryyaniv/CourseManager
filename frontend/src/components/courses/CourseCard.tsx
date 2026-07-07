@@ -6,6 +6,9 @@ import { StatusBadge } from '../ui/Badge';
 import { formatDate } from '../../utils/date';
 import { changeStatus } from '../../api/courses';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
+import Modal from '../ui/Modal';
+import Button from '../ui/Button';
 
 interface Props {
   course: Course;
@@ -22,7 +25,10 @@ export default function CourseCard({ course, onStatusChanged }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [changing, setChanging] = useState(false);
-  const [error, setError] = useState('');
+  const [_error, setError] = useState('');
+
+  const { showToast } = useToast();
+  const [confirmStatus, setConfirmStatus] = useState<CourseStatus | null>(null);
 
   const canEdit = user?.role === 'admin' || user?.role === 'coordinator';
   const nextStatus = NEXT_STATUS[course.status];
@@ -31,32 +37,33 @@ export default function CourseCard({ course, onStatusChanged }: Props) {
   const pct = total > 0 ? Math.round((done / total) * 100) : 100;
   const checklistBlocked = course.checklistIncomplete && nextStatus;
 
-  const handleAdvance = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!nextStatus || checklistBlocked) return;
+  const doStatusChange = async (status: CourseStatus) => {
     setChanging(true);
     setError('');
     try {
-      const updated = await changeStatus(course._id, nextStatus);
+      const updated = await changeStatus(course._id, status);
       onStatusChanged?.(updated);
+      showToast(`הקורס הועבר לסטטוס "${status}"`, 'success');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg ?? 'שגיאה');
+      showToast(msg ?? 'שגיאה בשינוי סטטוס', 'error');
       setTimeout(() => setError(''), 4000);
     } finally {
       setChanging(false);
+      setConfirmStatus(null);
     }
   };
 
-  const handleCancel = async (e: React.MouseEvent) => {
+  const handleAdvanceClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setChanging(true);
-    try {
-      const updated = await changeStatus(course._id, 'בוטל');
-      onStatusChanged?.(updated);
-    } finally {
-      setChanging(false);
-    }
+    if (!nextStatus || checklistBlocked) return;
+    setConfirmStatus(nextStatus);
+  };
+
+  const handleCancelClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setConfirmStatus('בוטל');
   };
 
   return (
@@ -126,7 +133,7 @@ export default function CourseCard({ course, onStatusChanged }: Props) {
         >
           {nextStatus && (
             <button
-              onClick={handleAdvance}
+              onClick={handleAdvanceClick}
               disabled={!!checklistBlocked || changing}
               title={checklistBlocked ? `יש לסיים את הצ'קליסט תחילה (${done}/${total})` : `שנה סטטוס ל-${nextStatus}`}
               className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors
@@ -143,7 +150,7 @@ export default function CourseCard({ course, onStatusChanged }: Props) {
             </button>
           )}
           <button
-            onClick={handleCancel}
+            onClick={handleCancelClick}
             disabled={changing}
             title="בטל קורס"
             className="px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300"
@@ -153,14 +160,28 @@ export default function CourseCard({ course, onStatusChanged }: Props) {
         </div>
       )}
 
-      {/* Error flash */}
-      {error && (
-        <div
-          className="mt-2 text-xs text-red-600 bg-red-50 border border-red-100 rounded-md px-3 py-1.5"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {error}
-        </div>
+      {/* Confirm modal */}
+      {confirmStatus && (
+        <Modal open onClose={() => setConfirmStatus(null)} size="sm">
+          <div className="text-center space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800 text-base">שינוי סטטוס קורס</p>
+              <p className="text-sm text-gray-500 mt-1">
+                להעביר את <span className="font-medium text-gray-700">"{course.name?.name}"</span> לסטטוס{' '}
+                <span className="font-semibold text-primary">"{confirmStatus}"</span>?
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="secondary" className="flex-1" onClick={() => setConfirmStatus(null)}>ביטול</Button>
+              <Button className="flex-1" loading={changing} onClick={() => doStatusChange(confirmStatus)}>אישור</Button>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );

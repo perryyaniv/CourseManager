@@ -30,7 +30,7 @@ export default function NewCourse() {
         <h1 className="text-2xl font-bold text-gray-900">{t('nav.addCourse')}</h1>
       </div>
       <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <CourseForm onSubmit={handleSubmit} onCancel={() => navigate('/courses')} loading={loading} />
+        <CourseForm onSubmit={handleSubmit} onCancel={() => navigate('/courses')} loading={loading} wizard />
       </div>
     </div>
   );

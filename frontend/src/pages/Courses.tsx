@@ -103,8 +103,25 @@ export default function Courses() {
       {loading ? (
         <Spinner />
       ) : courses.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-lg">{t('courses.noResults')}</p>
+        <div className="text-center py-20">
+          <div className="w-16 h-16 bg-primary/10 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+            {filters.search || filters.status || filters.academicYear ? t('courses.noResults') : 'אין קורסים עדיין'}
+          </h2>
+          <p className="text-sm text-gray-400 mb-6">
+            {filters.search || filters.status || filters.academicYear
+              ? 'נסה לשנות את הסינון'
+              : 'הוסף את הקורס הראשון כדי להתחיל'}
+          </p>
+          {isCoordinator && !filters.search && !filters.status && !filters.academicYear && (
+            <Button onClick={() => navigate('/courses/new')} size="lg">
+              + הוספת קורס ראשון
+            </Button>
+          )}
         </div>
       ) : (
         <>

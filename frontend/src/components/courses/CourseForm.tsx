@@ -33,6 +33,7 @@ interface Props {
   onCancel: () => void;
   loading?: boolean;
   checklistIncomplete?: boolean;
+  wizard?: boolean;
 }
 
 function toForm(course?: Partial<Course>): FormData {
@@ -56,7 +57,8 @@ function toForm(course?: Partial<Course>): FormData {
   };
 }
 
-export default function CourseForm({ initial, onSubmit, onCancel, loading, checklistIncomplete }: Props) {
+export default function CourseForm({ initial, onSubmit, onCancel, loading, checklistIncomplete, wizard = false }: Props) {
+  const [step, setStep] = useState(1);
   const { t } = useTranslation();
   const [form, setForm] = useState<FormData>(toForm(initial));
   const [courseNames, setCourseNames] = useState<ManagedListItem[]>([]);
@@ -105,8 +107,26 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading, check
     <div><label className="label">{label}</label>{children}</div>
   );
 
+  const canProceed = !!form.name && !!form.type;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Wizard progress */}
+      {wizard && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs font-medium text-gray-500">
+            <span className={step === 1 ? 'text-primary font-semibold' : ''}>שלב 1: פרטים בסיסיים</span>
+            <span className={step === 2 ? 'text-primary font-semibold' : ''}>שלב 2: לוח זמנים</span>
+          </div>
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-primary rounded-full transition-all duration-300" style={{ width: step === 1 ? '50%' : '100%' }} />
+          </div>
+          <p className="text-xs text-gray-400 text-left">שלב {step} מתוך 2</p>
+        </div>
+      )}
+
+      {/* Step 1 — basic info (always shown in non-wizard mode) */}
+      {(!wizard || step === 1) && (<>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {field(t('courses.courseName') + ' *', (
           <select required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls}>
@@ -154,50 +174,8 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading, check
           )}
         </div>
 
-        {field(t('courses.totalHours'), (
-          <input type="number" min="0" value={form.totalHours} onChange={(e) => set('totalHours', e.target.value)} className={inputCls} />
-        ))}
-
-        {field(t('courses.sessionsCount'), (
-          <input type="number" min="0" value={form.sessionsCount} onChange={(e) => set('sessionsCount', e.target.value)} className={inputCls} />
-        ))}
-
-        {field(t('courses.startDate'), (
-          <DateInput value={form.startDate} onChange={(v) => set('startDate', v)} className={inputCls + ' pl-9'} />
-        ))}
-
-        {field(t('courses.endDate'), (
-          <DateInput value={form.endDate} onChange={(v) => set('endDate', v)} className={inputCls + ' pl-9'} />
-        ))}
-
-        {field(t('courses.timeOfDay'), (
-          <select value={form.timeOfDay} onChange={(e) => set('timeOfDay', e.target.value as TimeOfDay | '')} className={inputCls}>
-            <option value="">בחר...</option>
-            {TIMES_OF_DAY.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-        ))}
-
-        {field(t('courses.startTime'), (
-          <input type="time" value={form.startTime} onChange={(e) => set('startTime', e.target.value)} className={inputCls} />
-        ))}
-
-        {field(t('courses.endTime'), (
-          <input type="time" value={form.endTime} onChange={(e) => set('endTime', e.target.value)} className={inputCls} />
-        ))}
-
-        {field(t('courses.location'), (
-          <select value={form.location} onChange={(e) => set('location', e.target.value)} className={inputCls}>
-            <option value="">בחר...</option>
-            {locations.map((l) => <option key={l._id} value={l._id}>{l.name}</option>)}
-          </select>
-        ))}
-
         {field(t('courses.academicYear'), (
           <input value={form.academicYear} onChange={(e) => set('academicYear', e.target.value)} placeholder='2024-2025' className={inputCls} />
-        ))}
-
-        {field(t('courses.numberOfStudents'), (
-          <input type="number" min="0" value={form.numberOfStudents} onChange={(e) => set('numberOfStudents', e.target.value)} className={inputCls} />
         ))}
 
       </div>
@@ -229,10 +207,67 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading, check
         <label htmlFor="credit" className="text-sm text-gray-700">{t('courses.isRecognizedForCredit')}</label>
       </div>
 
-      <div className="flex gap-3 justify-end pt-2 border-t border-gray-100">
-        <Button type="button" variant="secondary" onClick={onCancel}>{t('common.cancel')}</Button>
-        <Button type="submit" loading={loading}>{t('common.save')}</Button>
-      </div>
+      </>)}
+
+      {/* Step 1 next button */}
+      {wizard && step === 1 && (
+        <div className="flex gap-3 justify-end pt-2 border-t border-gray-100">
+          <Button type="button" variant="secondary" onClick={onCancel}>{t('common.cancel')}</Button>
+          <Button type="button" disabled={!canProceed} onClick={() => setStep(2)}>
+            הבא — לוח זמנים ←
+          </Button>
+        </div>
+      )}
+
+      {/* Step 2 — schedule (wizard only) */}
+      {(!wizard || step === 2) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {field(t('courses.totalHours'), (
+            <input type="number" min="0" value={form.totalHours} onChange={(e) => set('totalHours', e.target.value)} className={inputCls} />
+          ))}
+          {field(t('courses.sessionsCount'), (
+            <input type="number" min="0" value={form.sessionsCount} onChange={(e) => set('sessionsCount', e.target.value)} className={inputCls} />
+          ))}
+          {field(t('courses.startDate'), (
+            <DateInput value={form.startDate} onChange={(v) => set('startDate', v)} className={inputCls + ' pl-9'} />
+          ))}
+          {field(t('courses.endDate'), (
+            <DateInput value={form.endDate} onChange={(v) => set('endDate', v)} className={inputCls + ' pl-9'} />
+          ))}
+          {field(t('courses.timeOfDay'), (
+            <select value={form.timeOfDay} onChange={(e) => set('timeOfDay', e.target.value as TimeOfDay | '')} className={inputCls}>
+              <option value="">בחר...</option>
+              {TIMES_OF_DAY.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          ))}
+          {field(t('courses.startTime'), (
+            <input type="time" value={form.startTime} onChange={(e) => set('startTime', e.target.value)} className={inputCls} />
+          ))}
+          {field(t('courses.endTime'), (
+            <input type="time" value={form.endTime} onChange={(e) => set('endTime', e.target.value)} className={inputCls} />
+          ))}
+          {field(t('courses.location'), (
+            <select value={form.location} onChange={(e) => set('location', e.target.value)} className={inputCls}>
+              <option value="">בחר...</option>
+              {locations.map((l) => <option key={l._id} value={l._id}>{l.name}</option>)}
+            </select>
+          ))}
+          {field(t('courses.numberOfStudents'), (
+            <input type="number" min="0" value={form.numberOfStudents} onChange={(e) => set('numberOfStudents', e.target.value)} className={inputCls} />
+          ))}
+        </div>
+      )}
+
+      {/* Final actions */}
+      {(!wizard || step === 2) && (
+        <div className="flex gap-3 justify-end pt-2 border-t border-gray-100">
+          {wizard && step === 2 && (
+            <Button type="button" variant="ghost" onClick={() => setStep(1)}>→ חזור</Button>
+          )}
+          <Button type="button" variant="secondary" onClick={onCancel}>{t('common.cancel')}</Button>
+          <Button type="submit" loading={loading}>{t('common.save')}</Button>
+        </div>
+      )}
     </form>
   );
 }
