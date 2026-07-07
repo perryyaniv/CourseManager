@@ -13,7 +13,7 @@ export default function Layout() {
           <img src="/logo.png" alt="לוגו" className="h-6 w-auto bg-white rounded p-0.5 opacity-80" />
           <p className="text-xs text-white/60">© {new Date().getFullYear()} המכון הבינלאומי למנהיגות</p>
           <a href="mailto:perryyaniv@gmail.com" className="text-xs text-white/40 hover:text-white/70 transition-colors">
-            Yaniv Perry
+            Developed by Yaniv Perry
           </a>
         </div>
       </footer>
