@@ -52,10 +52,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-dark">{t('dashboard.title')}</h1>
-        <Link to="/courses" className="text-sm text-primary font-semibold hover:underline">כל הקורסים ←</Link>
-      </div>
+      <h1 className="text-xl font-bold text-dark">{t('dashboard.title')}</h1>
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
