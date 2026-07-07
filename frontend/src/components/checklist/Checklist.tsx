@@ -100,7 +100,6 @@ export default function Checklist({ courseId }: Props) {
 
         const statusIndex = STATUS_ORDER.indexOf(status);
         const isCurrent = status === courseStatus;
-        const isPast = statusIndex < currentStatusIndex;
         const isFuture = statusIndex > currentStatusIndex;
         const colors = STATUS_COLORS[status];
 
