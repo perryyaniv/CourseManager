@@ -127,7 +127,7 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading, check
 
       {/* Step 1 — basic info (always shown in non-wizard mode) */}
       {(!wizard || step === 1) && (<>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {field(t('courses.courseName') + ' *', (
           <select required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls}>
             <option value="">בחר...</option>
@@ -221,7 +221,7 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading, check
 
       {/* Step 2 — schedule (wizard only) */}
       {(!wizard || step === 2) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {field(t('courses.totalHours'), (
             <input type="number" min="0" value={form.totalHours} onChange={(e) => set('totalHours', e.target.value)} className={inputCls} />
           ))}

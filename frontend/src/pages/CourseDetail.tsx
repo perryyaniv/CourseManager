@@ -20,9 +20,9 @@ type Tab = 'details' | 'checklist' | 'history';
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="py-2.5 border-b border-gray-50 last:border-0">
-      <span className="label mb-0.5">{label}</span>
-      <span className="text-sm text-gray-800 font-medium block">{value ?? '—'}</span>
+    <div className="py-2 border-b border-gray-50 last:border-0">
+      <span className="label mb-0.5 text-[10px]">{label}</span>
+      <span className="text-sm text-gray-800 font-medium block leading-snug">{value ?? '—'}</span>
     </div>
   );
 }
@@ -111,7 +111,7 @@ export default function CourseDetail() {
   ];
 
   return (
-    <div className="space-y-3 max-w-4xl">
+    <div className="space-y-3">
       {liveAlert && (
         <div className="bg-amber-50 border border-amber-300 text-amber-800 text-sm px-4 py-2.5 rounded-md">
           {liveAlert}
@@ -175,14 +175,14 @@ export default function CourseDetail() {
               {/* Section 1 — basic info */}
               <div>
                 <p className="section-title mb-3">פרטים בסיסיים</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4">
                   <DetailRow label={t('courses.courseName')} value={course.name?.name} />
                   <DetailRow label={t('courses.catalogueId')} value={course.catalogueId} />
                   <DetailRow label={t('courses.type')} value={course.type?.name} />
                   <DetailRow label={t('courses.status')} value={<StatusBadge status={course.status} />} />
                   <DetailRow label={t('courses.academicYear')} value={course.academicYear} />
                   <DetailRow label={t('courses.isRecognizedForCredit')} value={course.isRecognizedForCredit ? 'כן' : 'לא'} />
-                  <div className="sm:col-span-2">
+                  <div className="col-span-2 md:col-span-3">
                     <DetailRow
                       label={t('courses.lecturers')}
                       value={course.lecturers?.map((l) => `${l.firstName} ${l.lastName}`).join(', ') || undefined}
@@ -194,13 +194,13 @@ export default function CourseDetail() {
               {/* Section 2 — schedule */}
               <div className="pt-4 border-t border-gray-100">
                 <p className="section-title mb-3">לוח זמנים</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4">
                   <DetailRow label={t('courses.startDate')} value={formatDate(course.startDate)} />
                   <DetailRow label={t('courses.endDate')} value={formatDate(course.endDate)} />
+                  <DetailRow label={t('courses.location')} value={course.location?.name} />
                   <DetailRow label={t('courses.timeOfDay')} value={course.timeOfDay} />
                   <DetailRow label={t('courses.startTime')} value={course.startTime} />
                   <DetailRow label={t('courses.endTime')} value={course.endTime} />
-                  <DetailRow label={t('courses.location')} value={course.location?.name} />
                   <DetailRow label={t('courses.totalHours')} value={course.totalHours} />
                   <DetailRow label={t('courses.sessionsCount')} value={course.sessionsCount} />
                   <DetailRow label={t('courses.numberOfStudents')} value={course.numberOfStudents} />
