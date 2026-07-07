@@ -58,6 +58,8 @@ export interface Course {
   createdAt: string;
   updatedAt: string;
   checklistIncomplete?: boolean;
+  checklistDone?: number;
+  checklistTotal?: number;
 }
 
 export interface ChecklistEntry {

@@ -112,7 +112,15 @@ export default function Courses() {
 
           {view === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {courses.map((c) => <CourseCard key={c._id} course={c} />)}
+              {courses.map((c) => (
+                <CourseCard
+                  key={c._id}
+                  course={c}
+                  onStatusChanged={(updated) =>
+                    setCourses((prev) => prev.map((x) => x._id === updated._id ? { ...updated, checklistDone: c.checklistDone, checklistTotal: c.checklistTotal } : x))
+                  }
+                />
+              ))}
             </div>
           ) : (
             <CourseTable

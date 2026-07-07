@@ -13,6 +13,9 @@ export const createCourse = (data: Partial<Course>) =>
 export const updateCourse = (id: string, data: Partial<Course>) =>
   client.put<Course>(`/courses/${id}`, data).then((r) => r.data);
 
+export const changeStatus = (id: string, status: string) =>
+  client.put<Course>(`/courses/${id}`, { status }).then((r) => r.data);
+
 export const deleteCourse = (id: string) =>
   client.delete(`/courses/${id}`).then((r) => r.data);
 

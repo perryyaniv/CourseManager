@@ -57,23 +57,38 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     .limit(limitNum)
     .lean();
 
-  // Attach checklistIncomplete flag — only count items applicable to each course's status
-  // Note: use ?? ALL_STATUSES fallback for legacy docs that predate the applicableStatuses field
+  // Attach checklist progress per course, counting only items applicable to each course's status
   const ALL_STATUSES = ['בתכנון', 'פעיל', 'הושלם', 'בוטל'];
-  const allActiveItems = await ChecklistItem.find({ active: true }).select('applicableStatuses').lean();
+  const allActiveItems = await ChecklistItem.find({ active: true }).select('_id applicableStatuses').lean();
   const courseIds = courses.map((c) => c._id);
-  const checkedCounts = await ChecklistState.aggregate([
-    { $match: { courseId: { $in: courseIds }, checked: true } },
-    { $group: { _id: '$courseId', count: { $sum: 1 } } },
-  ]);
-  const checkedMap = new Map(checkedCounts.map((c) => [c._id.toString(), c.count as number]));
+
+  // Load all checked states for these courses (only checked=true)
+  const allCheckedStates = await ChecklistState.find({
+    courseId: { $in: courseIds },
+    checked: true,
+  }).select('courseId itemId').lean();
+
+  // Build a map: courseId → Set of checked itemIds
+  const checkedByCoursMap = new Map<string, Set<string>>();
+  for (const s of allCheckedStates) {
+    const cid = s.courseId.toString();
+    if (!checkedByCoursMap.has(cid)) checkedByCoursMap.set(cid, new Set());
+    checkedByCoursMap.get(cid)!.add(s.itemId.toString());
+  }
+
   const result = courses.map((c) => {
-    const applicableCount = allActiveItems.filter((i) =>
+    const applicable = allActiveItems.filter((i) =>
       ((i.applicableStatuses as string[] | undefined) ?? ALL_STATUSES).includes(c.status as string)
-    ).length;
+    );
+    const applicableIds = new Set(applicable.map((i) => i._id.toString()));
+    const checkedSet = checkedByCoursMap.get(c._id.toString()) ?? new Set<string>();
+    const checklistDone = [...applicableIds].filter((id) => checkedSet.has(id)).length;
+    const checklistTotal = applicableIds.size;
     return {
       ...c,
-      checklistIncomplete: applicableCount > 0 && (checkedMap.get(c._id.toString()) ?? 0) < applicableCount,
+      checklistDone,
+      checklistTotal,
+      checklistIncomplete: checklistTotal > 0 && checklistDone < checklistTotal,
     };
   });
 

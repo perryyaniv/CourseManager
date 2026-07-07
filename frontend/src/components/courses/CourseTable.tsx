@@ -43,6 +43,7 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
             {th(t('courses.courseName'), 'courseName')}
             {th(t('courses.type'), undefined, 'hidden sm:table-cell')}
             {th(t('courses.status'), 'status')}
+            {th("צ'קליסט", undefined, 'hidden sm:table-cell')}
             {th(t('courses.startDate'), 'startDate', 'hidden sm:table-cell')}
             {th(t('courses.location'), undefined, 'hidden md:table-cell')}
             {th(t('courses.academicYear'), undefined, 'hidden md:table-cell')}
@@ -67,6 +68,21 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
               </td>
               <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{course.type?.name ?? '—'}</td>
               <td className="px-4 py-3"><StatusBadge status={course.status} /></td>
+              <td className="px-4 py-3 hidden sm:table-cell">
+                {(course.checklistTotal ?? 0) > 0 ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-1.5 rounded-full ${course.checklistIncomplete ? 'bg-red-400' : 'bg-green-500'}`}
+                        style={{ width: `${Math.round(((course.checklistDone ?? 0) / (course.checklistTotal ?? 1)) * 100)}%` }}
+                      />
+                    </div>
+                    <span className={`text-xs font-medium ${course.checklistIncomplete ? 'text-red-500' : 'text-green-600'}`}>
+                      {course.checklistDone}/{course.checklistTotal}
+                    </span>
+                  </div>
+                ) : '—'}
+              </td>
               <td className="px-4 py-3 text-gray-600 whitespace-nowrap hidden sm:table-cell">{formatDate(course.startDate)}</td>
               <td className="px-4 py-3 text-gray-600 hidden md:table-cell">{course.location?.name ?? '—'}</td>
               <td className="px-4 py-3 text-gray-600 hidden md:table-cell">{course.academicYear ?? '—'}</td>
