@@ -171,28 +171,39 @@ export default function CourseDetail() {
           editing ? (
             <CourseForm initial={course} onSubmit={handleSave} onCancel={() => setEditing(false)} loading={saving} checklistIncomplete={course.checklistIncomplete} wizard />
           ) : (
-            <div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                <DetailRow label={t('courses.courseName')} value={course.name?.name} />
-                <DetailRow label={t('courses.catalogueId')} value={course.catalogueId} />
-                <DetailRow label={t('courses.type')} value={course.type?.name} />
-                <DetailRow label={t('courses.status')} value={<StatusBadge status={course.status} />} />
-                <DetailRow label={t('courses.academicYear')} value={course.academicYear} />
-                <DetailRow label={t('courses.totalHours')} value={course.totalHours} />
-                <DetailRow label={t('courses.sessionsCount')} value={course.sessionsCount} />
-                <DetailRow label={t('courses.startDate')} value={formatDate(course.startDate)} />
-                <DetailRow label={t('courses.endDate')} value={formatDate(course.endDate)} />
-                <DetailRow label={t('courses.timeOfDay')} value={course.timeOfDay} />
-                <DetailRow label={t('courses.startTime')} value={course.startTime} />
-                <DetailRow label={t('courses.endTime')} value={course.endTime} />
-                <DetailRow label={t('courses.location')} value={course.location?.name} />
-                <DetailRow label={t('courses.numberOfStudents')} value={course.numberOfStudents} />
-                <DetailRow label={t('courses.isRecognizedForCredit')} value={course.isRecognizedForCredit ? 'כן' : 'לא'} />
-                <div className="sm:col-span-2">
-                  <DetailRow
-                    label={t('courses.lecturers')}
-                    value={course.lecturers?.map((l) => `${l.firstName} ${l.lastName}`).join(', ') || undefined}
-                  />
+            <div className="space-y-5">
+              {/* Section 1 — basic info */}
+              <div>
+                <p className="section-title mb-3">פרטים בסיסיים</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                  <DetailRow label={t('courses.courseName')} value={course.name?.name} />
+                  <DetailRow label={t('courses.catalogueId')} value={course.catalogueId} />
+                  <DetailRow label={t('courses.type')} value={course.type?.name} />
+                  <DetailRow label={t('courses.status')} value={<StatusBadge status={course.status} />} />
+                  <DetailRow label={t('courses.academicYear')} value={course.academicYear} />
+                  <DetailRow label={t('courses.isRecognizedForCredit')} value={course.isRecognizedForCredit ? 'כן' : 'לא'} />
+                  <div className="sm:col-span-2">
+                    <DetailRow
+                      label={t('courses.lecturers')}
+                      value={course.lecturers?.map((l) => `${l.firstName} ${l.lastName}`).join(', ') || undefined}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2 — schedule */}
+              <div className="pt-4 border-t border-gray-100">
+                <p className="section-title mb-3">לוח זמנים</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                  <DetailRow label={t('courses.startDate')} value={formatDate(course.startDate)} />
+                  <DetailRow label={t('courses.endDate')} value={formatDate(course.endDate)} />
+                  <DetailRow label={t('courses.timeOfDay')} value={course.timeOfDay} />
+                  <DetailRow label={t('courses.startTime')} value={course.startTime} />
+                  <DetailRow label={t('courses.endTime')} value={course.endTime} />
+                  <DetailRow label={t('courses.location')} value={course.location?.name} />
+                  <DetailRow label={t('courses.totalHours')} value={course.totalHours} />
+                  <DetailRow label={t('courses.sessionsCount')} value={course.sessionsCount} />
+                  <DetailRow label={t('courses.numberOfStudents')} value={course.numberOfStudents} />
                 </div>
               </div>
 
