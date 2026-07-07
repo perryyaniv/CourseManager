@@ -73,6 +73,28 @@ export default function Dashboard() {
         />
       </div>
 
+      {/* Incomplete checklist — most important, shown prominently */}
+      {incomplete.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="section-title text-red-600 mb-3">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+            {t('dashboard.incompleteCourses')} ({incomplete.length})
+          </div>
+          <div className="space-y-1">
+            {incomplete.map((c) => (
+              <Link key={c._id} to={`/courses/${c._id}`}
+                className="flex items-center justify-between py-2 px-2 rounded-md hover:bg-red-100 transition-colors group">
+                <span className="text-sm font-medium text-gray-800 group-hover:text-red-700 truncate">{c.name?.name}</span>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-xs text-gray-400 hidden sm:block">{formatDate(c.startDate)}</span>
+                  <StatusBadge status={c.status} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Courses by status */}
       <div className="card">
         <div className="section-title">
@@ -95,28 +117,6 @@ export default function Dashboard() {
             </div>
         }
       </div>
-
-      {/* Incomplete checklist — most important, shown prominently */}
-      {incomplete.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="section-title text-red-600 mb-3">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-            {t('dashboard.incompleteCourses')} ({incomplete.length})
-          </div>
-          <div className="space-y-1">
-            {incomplete.map((c) => (
-              <Link key={c._id} to={`/courses/${c._id}`}
-                className="flex items-center justify-between py-2 px-2 rounded-md hover:bg-red-100 transition-colors group">
-                <span className="text-sm font-medium text-gray-800 group-hover:text-red-700 truncate">{c.name?.name}</span>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs text-gray-400 hidden sm:block">{formatDate(c.startDate)}</span>
-                  <StatusBadge status={c.status} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Recent courses — last */}
       <div className="card">
