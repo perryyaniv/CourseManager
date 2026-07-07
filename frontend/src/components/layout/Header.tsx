@@ -46,15 +46,16 @@ export default function Header() {
         <div className="bg-primary px-4 sm:px-6">
           <div className="max-w-7xl mx-auto flex items-center h-14 gap-3">
 
-            {/* Hamburger — first in DOM = rightmost in RTL */}
+            {/* Hamburger / Close — toggles in place */}
             <button
               className="md:hidden p-2 rounded-md text-white/80 hover:text-white hover:bg-white/10 flex-shrink-0"
-              onClick={() => setDrawerOpen(true)}
+              onClick={() => setDrawerOpen((o) => !o)}
               aria-label="תפריט"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              {drawerOpen
+                ? <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              }
             </button>
 
             {/* Logo */}
@@ -110,41 +111,19 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Mobile: search icon only */}
-            <button
-              className="md:hidden p-2 rounded-md text-white/80 hover:text-white hover:bg-white/10 mr-auto"
-              onClick={() => setDrawerOpen(true)}
-              aria-label="חיפוש"
-              style={{ display: 'none' }}
-            />
           </div>
         </div>
         <div className="h-1 bg-accent" />
       </header>
 
-      {/* Right-side drawer overlay */}
+      {/* Right-side drawer — starts below the sticky header (h-14 + h-1 accent = 60px) */}
       {drawerOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 top-[60px] z-40 md:hidden">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40" onClick={() => setDrawerOpen(false)} />
 
-          {/* Drawer — slides in from the right */}
+          {/* Drawer panel */}
           <div className="absolute top-0 right-0 h-full w-72 bg-primary shadow-xl flex flex-col">
-            {/* Drawer header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-              <div className="bg-white rounded-md px-2 py-1">
-                <img src="/logo.png" alt="לוגו" className="h-8 w-auto" />
-              </div>
-              <button
-                onClick={() => setDrawerOpen(false)}
-                className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/10"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
             {/* Search */}
             <div className="px-4 py-3 border-b border-white/10">
               <form onSubmit={(e) => { handleSearch(e); setDrawerOpen(false); }} className="flex gap-2">
