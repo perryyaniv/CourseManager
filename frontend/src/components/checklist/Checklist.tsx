@@ -114,17 +114,6 @@ export default function Checklist({ courseId }: Props) {
                 <span className={`text-xs font-bold uppercase tracking-wide ${isFuture ? 'text-gray-400' : colors.header}`}>
                   {STATUS_LABELS[status]}
                 </span>
-                {isCurrent && (
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${colors.badge}`}>
-                    שלב נוכחי
-                  </span>
-                )}
-                {isPast && (
-                  <span className="text-xs text-gray-400 font-medium">הושלם</span>
-                )}
-                {isFuture && (
-                  <span className="text-xs text-gray-300 font-medium">עתידי</span>
-                )}
               </div>
               <span className="text-xs text-gray-400 font-medium">
                 {sectionChecked}/{sectionItems.length}
