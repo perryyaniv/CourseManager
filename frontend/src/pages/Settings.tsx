@@ -98,7 +98,8 @@ function LecturerEditor() {
   const [items, setItems] = useState<Lecturer[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ firstName: '', lastName: '', phone: '', email: '' });
-  const [adding, setAdding] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     getList<Lecturer>('lecturers').then(setItems).finally(() => setLoading(false));
@@ -106,11 +107,17 @@ function LecturerEditor() {
 
   const handleAdd = async () => {
     if (!form.firstName.trim() || !form.lastName.trim()) return;
-    setAdding(true);
+    setSaving(true);
     const item = await createItem<Lecturer>('lecturers', form);
     setItems((prev) => [...prev, item]);
     setForm({ firstName: '', lastName: '', phone: '', email: '' });
-    setAdding(false);
+    setSaving(false);
+    setShowForm(false);
+  };
+
+  const handleCancel = () => {
+    setForm({ firstName: '', lastName: '', phone: '', email: '' });
+    setShowForm(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -125,24 +132,16 @@ function LecturerEditor() {
 
   if (loading) return <Spinner size="sm" />;
 
-  const inputCls = 'input';
-
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <input value={form.firstName} onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))} placeholder={t('settings.firstName')} className={inputCls} />
-        <input value={form.lastName} onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))} placeholder={t('settings.lastName')} className={inputCls} />
-        <input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder={t('settings.phone')} className={inputCls} />
-        <input value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder={t('settings.email')} className={inputCls} />
-      </div>
-      <Button size="sm" loading={adding} onClick={handleAdd}>{t('common.add')}</Button>
+      {/* Existing lecturers list */}
       <div className="space-y-1">
         {items.map((l) => (
-          <div key={l._id} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 group">
+          <div key={l._id} className="flex items-center justify-between py-2.5 px-3 rounded-md border border-gray-100 bg-white hover:border-primary/20 hover:bg-primary/5 group transition-colors">
             <div>
               <span className={`text-sm font-medium ${l.active ? 'text-gray-800' : 'text-gray-400'}`}>{l.firstName} {l.lastName}</span>
               {(l.phone || l.email) && (
-                <p className="text-xs text-gray-400">{[l.phone, l.email].filter(Boolean).join(' · ')}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{[l.phone, l.email].filter(Boolean).join(' · ')}</p>
               )}
             </div>
             <button
@@ -153,8 +152,39 @@ function LecturerEditor() {
             </button>
           </div>
         ))}
-        {items.length === 0 && <p className="text-sm text-gray-400 text-center py-4">{t('common.noData')}</p>}
+        {items.length === 0 && !showForm && (
+          <p className="text-sm text-gray-400 text-center py-4">{t('common.noData')}</p>
+        )}
       </div>
+
+      {/* Add form — shown only when toggled */}
+      {showForm ? (
+        <div className="border border-primary/20 bg-primary/5 rounded-md p-4 space-y-3">
+          <p className="text-xs font-semibold text-primary uppercase tracking-wide">הוספת מרצה</p>
+          <div className="grid grid-cols-2 gap-2">
+            <input value={form.firstName} onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))} placeholder={t('settings.firstName')} className="input" autoFocus />
+            <input value={form.lastName} onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))} placeholder={t('settings.lastName')} className="input" />
+            <input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder={t('settings.phone')} className="input" />
+            <input value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder={t('settings.email')} className="input" />
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button size="sm" variant="secondary" onClick={handleCancel}>{t('common.cancel')}</Button>
+            <Button size="sm" loading={saving} onClick={handleAdd} disabled={!form.firstName.trim() || !form.lastName.trim()}>
+              {t('common.save')}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setShowForm(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-md border border-dashed border-gray-300 text-sm text-gray-500 hover:border-primary hover:text-primary transition-colors w-full justify-center"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          {t('settings.addItem')} מרצה
+        </button>
+      )}
     </div>
   );
 }
