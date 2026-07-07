@@ -32,6 +32,7 @@ interface Props {
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
+  checklistIncomplete?: boolean;
 }
 
 function toForm(course?: Partial<Course>): FormData {
@@ -55,7 +56,7 @@ function toForm(course?: Partial<Course>): FormData {
   };
 }
 
-export default function CourseForm({ initial, onSubmit, onCancel, loading }: Props) {
+export default function CourseForm({ initial, onSubmit, onCancel, loading, checklistIncomplete }: Props) {
   const { t } = useTranslation();
   const [form, setForm] = useState<FormData>(toForm(initial));
   const [courseNames, setCourseNames] = useState<ManagedListItem[]>([]);
@@ -125,11 +126,33 @@ export default function CourseForm({ initial, onSubmit, onCancel, loading }: Pro
           </select>
         ))}
 
-        {field(t('courses.status'), (
-          <select value={form.status} onChange={(e) => set('status', e.target.value as CourseStatus)} className={inputCls}>
-            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+        <div>
+          <label className="label">{t('courses.status')}</label>
+          <select
+            value={form.status}
+            onChange={(e) => set('status', e.target.value as CourseStatus)}
+            className={inputCls}
+          >
+            {STATUSES.map((s) => {
+              const isCurrentStatus = s === initial?.status;
+              const isCancellation = s === 'בוטל';
+              const blocked = checklistIncomplete && !isCurrentStatus && !isCancellation;
+              return (
+                <option key={s} value={s} disabled={blocked}>
+                  {s}{blocked ? ' (השלם צ\'קליסט תחילה)' : ''}
+                </option>
+              );
+            })}
           </select>
-        ))}
+          {checklistIncomplete && (
+            <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+              <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+              שינוי סטטוס חסום — יש לסיים את הצ'קליסט של הסטטוס הנוכחי תחילה
+            </p>
+          )}
+        </div>
 
         {field(t('courses.totalHours'), (
           <input type="number" min="0" value={form.totalHours} onChange={(e) => set('totalHours', e.target.value)} className={inputCls} />

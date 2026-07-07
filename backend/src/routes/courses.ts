@@ -97,6 +97,30 @@ router.put('/:id', requireRole('admin', 'coordinator'), async (req: AuthRequest,
   const existing = await Course.findById(req.params.id).lean();
   if (!existing) { res.status(404).json({ message: 'Not found' }); return; }
 
+  // Block status change if checklist for current status is incomplete
+  // (cancellation to בוטל is always allowed)
+  const newStatus = (req.body as Record<string, unknown>).status as string | undefined;
+  if (newStatus && newStatus !== existing.status && newStatus !== 'בוטל') {
+    const applicableItems = await ChecklistItem.find({
+      active: true,
+      applicableStatuses: existing.status,
+    }).select('_id').lean();
+
+    if (applicableItems.length > 0) {
+      const checkedCount = await ChecklistState.countDocuments({
+        courseId: req.params.id,
+        itemId: { $in: applicableItems.map((i) => i._id) },
+        checked: true,
+      });
+      if (checkedCount < applicableItems.length) {
+        res.status(400).json({
+          message: `לא ניתן לשנות סטטוס — יש לסיים את הצ'קליסט עבור "${existing.status}" תחילה (${checkedCount}/${applicableItems.length} הושלמו)`,
+        });
+        return;
+      }
+    }
+  }
+
   const io: Server = req.app.get('io');
   const updated = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate(POPULATE).lean();
 

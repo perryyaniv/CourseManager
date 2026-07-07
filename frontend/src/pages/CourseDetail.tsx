@@ -173,7 +173,7 @@ export default function CourseDetail() {
       <div className="card p-4 sm:p-5">
         {tab === 'details' && (
           editing ? (
-            <CourseForm initial={course} onSubmit={handleSave} onCancel={() => setEditing(false)} loading={saving} />
+            <CourseForm initial={course} onSubmit={handleSave} onCancel={() => setEditing(false)} loading={saving} checklistIncomplete={course.checklistIncomplete} />
           ) : (
             <div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
