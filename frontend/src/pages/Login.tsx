@@ -86,9 +86,12 @@ export default function Login() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">
-          © המכון הבינלאומי למנהיגות
-        </p>
+        <div className="flex items-center justify-between mt-4 px-1">
+          <p className="text-xs text-gray-400">© המכון הבינלאומי למנהיגות</p>
+          <a href="mailto:perryyaniv@gmail.com" className="text-xs text-gray-300 hover:text-gray-500 transition-colors">
+            Yaniv Perry
+          </a>
+        </div>
       </div>
     </div>
   );
