@@ -118,7 +118,7 @@ export default function Header() {
 
       {/* Right-side drawer — starts below the sticky header (h-14 + h-1 accent = 60px) */}
       {drawerOpen && (
-        <div className="fixed inset-0 top-[60px] z-40 md:hidden">
+        <div className="fixed top-[60px] bottom-14 left-0 right-0 z-40 md:hidden">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40" onClick={() => setDrawerOpen(false)} />
 
