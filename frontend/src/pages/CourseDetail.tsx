@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getCourse, updateCourse, deleteCourse, cloneCourse, addNote, deleteNote } from '../api/courses';
+import { getCourse, updateCourse, deleteCourse, addNote, deleteNote } from '../api/courses';
 import { Course } from '../types';
 import { StatusBadge } from '../components/ui/Badge';
 import CourseForm from '../components/courses/CourseForm';
@@ -83,12 +83,6 @@ export default function CourseDetail() {
     navigate('/courses');
   };
 
-  const handleClone = async () => {
-    if (!id) return;
-    const cloned = await cloneCourse(id);
-    navigate(`/courses/${cloned._id}`);
-  };
-
   const handleAddNote = async () => {
     if (!id || !noteContent.trim()) return;
     const updated = await addNote(id, noteType, noteContent.trim());
@@ -143,7 +137,6 @@ export default function CourseDetail() {
 
         {canEdit && (
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="secondary" size="sm" onClick={handleClone}>{t('courses.clone')}</Button>
             {!editing && <Button size="sm" onClick={() => setEditing(true)}>{t('courses.edit')}</Button>}
             {course.status === 'בתכנון' && isAdmin && (
               <Button variant="danger" size="sm" onClick={() => setDeleteModal(true)}>{t('courses.delete')}</Button>
