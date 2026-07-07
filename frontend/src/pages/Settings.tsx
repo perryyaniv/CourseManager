@@ -97,7 +97,7 @@ function LecturerEditor() {
   const { t } = useTranslation();
   const [items, setItems] = useState<Lecturer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ firstName: '', lastName: '', phone: '', email: '' });
+  const [form, setForm] = useState({ firstName: '', lastName: '', phone: '', email: '', description: '' });
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -110,13 +110,13 @@ function LecturerEditor() {
     setSaving(true);
     const item = await createItem<Lecturer>('lecturers', form);
     setItems((prev) => [...prev, item]);
-    setForm({ firstName: '', lastName: '', phone: '', email: '' });
+    setForm({ firstName: '', lastName: '', phone: '', email: '', description: '' });
     setSaving(false);
     setShowForm(false);
   };
 
   const handleCancel = () => {
-    setForm({ firstName: '', lastName: '', phone: '', email: '' });
+    setForm({ firstName: '', lastName: '', phone: '', email: '', description: '' });
     setShowForm(false);
   };
 
@@ -138,10 +138,13 @@ function LecturerEditor() {
       <div className="space-y-1">
         {items.map((l) => (
           <div key={l._id} className="flex items-center justify-between py-2.5 px-3 rounded-md border border-gray-100 bg-white hover:border-primary/20 hover:bg-primary/5 group transition-colors">
-            <div>
+            <div className="flex-1 min-w-0">
               <span className={`text-sm font-medium ${l.active ? 'text-gray-800' : 'text-gray-400'}`}>{l.firstName} {l.lastName}</span>
               {(l.phone || l.email) && (
                 <p className="text-xs text-gray-400 mt-0.5">{[l.phone, l.email].filter(Boolean).join(' · ')}</p>
+              )}
+              {l.description && (
+                <p className="text-xs text-gray-500 mt-0.5 truncate">{l.description}</p>
               )}
             </div>
             <button
@@ -167,6 +170,13 @@ function LecturerEditor() {
             <input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder={t('settings.phone')} className="input" />
             <input value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder={t('settings.email')} className="input" />
           </div>
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+            placeholder="תיאור / ביוגרפיה קצרה"
+            rows={3}
+            className="input resize-none"
+          />
           <div className="flex gap-2 justify-end">
             <Button size="sm" variant="secondary" onClick={handleCancel}>{t('common.cancel')}</Button>
             <Button size="sm" loading={saving} onClick={handleAdd} disabled={!form.firstName.trim() || !form.lastName.trim()}>

@@ -24,6 +24,7 @@ export interface Lecturer {
   lastName: string;
   phone?: string;
   email?: string;
+  description?: string;
   active: boolean;
 }
 
