@@ -58,16 +58,17 @@ export default function Dashboard() {
 
   useEffect(() => {
     getLecturers().then(setLecturers);
-    // Load all for KPI (no pagination)
-    getCourses({ page: 1, limit: 200, sortBy: 'statusPriority', sortDir: 'asc', activeOnly: false })
-      .then((r) => setAllCourses(r.data));
   }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await getCourses(filters);
+      const [result, allResult] = await Promise.all([
+        getCourses(filters),
+        getCourses({ ...filters, page: 1, limit: 500 }),
+      ]);
       setCourses(result.data);
+      setAllCourses(allResult.data);
       setTotal(result.total);
       setTotalPages(result.totalPages);
       const years = [...new Set(result.data.map((c) => c.academicYear).filter(Boolean))].sort().reverse();
