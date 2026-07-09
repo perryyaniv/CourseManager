@@ -23,10 +23,12 @@ const colorMap: Record<CardColor, { border: string; num: string; icon: string }>
 function StatCard({ label, value, icon, color = 'gray' }: { label: string; value: number; icon: React.ReactNode; color?: CardColor }) {
   const { border, num, icon: iconCls } = colorMap[color];
   return (
-    <div className={`bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-3 flex flex-col gap-1`}>
-      <div className={`${iconCls}`}>{icon}</div>
-      <p className={`text-xl font-bold leading-none ${num}`}>{value}</p>
-      <p className="text-[11px] text-gray-400 font-medium leading-tight">{label}</p>
+    <div className={`bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-2 flex items-center gap-2.5`}>
+      <div className={`${iconCls} flex-shrink-0`}>{icon}</div>
+      <div>
+        <p className={`text-lg font-bold leading-none ${num}`}>{value}</p>
+        <p className="text-[10px] text-gray-400 font-medium mt-0.5">{label}</p>
+      </div>
     </div>
   );
 }
@@ -106,19 +108,19 @@ export default function Dashboard() {
       {/* Header */}
       <h1 className="text-xl font-bold text-dark">{t('nav.courses')}</h1>
 
-      {/* KPI cards — 4 cols, subtle colors */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-        <StatCard label="סה״כ קורסים" value={totalAll} color="gray"
-          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>}
+      {/* KPI cards — always single row */}
+      <div className="grid grid-cols-4 gap-2">
+        <StatCard label="סה״כ" value={totalAll} color="gray"
+          icon={<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>}
         />
-        <StatCard label={t('dashboard.activeCourses')} value={active} color="green"
-          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+        <StatCard label="פעילים" value={active} color="green"
+          icon={<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
-        <StatCard label={t('dashboard.upcomingCourses')} value={upcoming} color="blue"
-          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
+        <StatCard label="בתכנון" value={upcoming} color="blue"
+          icon={<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
         />
-        <StatCard label={t('dashboard.incompleteCourses')} value={incomplete} color="red"
-          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>}
+        <StatCard label="צ'קליסט חסר" value={incomplete} color="red"
+          icon={<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>}
         />
       </div>
 
