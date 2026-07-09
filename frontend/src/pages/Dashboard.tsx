@@ -152,7 +152,8 @@ export default function Dashboard() {
           </button>
 
           {displayOpen && (
-            <div className="mt-2 card p-4 space-y-3 absolute z-10 bg-white min-w-[200px]">
+            <div className="mt-2 card p-4 space-y-4 absolute z-10 bg-white min-w-[220px]">
+              {/* View type */}
               <div>
                 <p className="label mb-2">סוג תצוגה</p>
                 <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
@@ -164,19 +165,41 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
+
+              {/* Sort */}
               <div>
-                <p className="label mb-2">סינון לפי סיום</p>
+                <p className="label mb-2">מיון</p>
+                <div className="space-y-1">
+                  {[
+                    { key: 'checklistPriority', label: 'ברירת מחדל (צ\'קליסט → פעיל → בתכנון)' },
+                    { key: 'courseName',        label: 'שם קורס' },
+                    { key: 'statusPriority',    label: 'סטטוס' },
+                    { key: 'startDate',         label: 'תאריך התחלה' },
+                  ].map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => handleFilterChange({ sortBy: key, sortDir: key === 'startDate' ? 'desc' : 'asc', page: 1 })}
+                      className={`w-full text-right px-3 py-2 rounded-md text-sm transition-colors ${
+                        filters.sortBy === key
+                          ? 'bg-primary/10 text-primary font-semibold'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {filters.sortBy === key && <span className="ml-1">✓</span>}
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Show completed */}
+              <div>
+                <p className="label mb-2">קורסים מוצגים</p>
                 <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
-                  <button
-                    onClick={() => handleFilterChange({ activeOnly: true, page: 1 })}
-                    className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${filters.activeOnly ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-                  >
+                  <button onClick={() => handleFilterChange({ activeOnly: true, page: 1 })} className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${filters.activeOnly ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
                     פעילים בלבד
                   </button>
-                  <button
-                    onClick={() => handleFilterChange({ activeOnly: false, page: 1 })}
-                    className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${!filters.activeOnly ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-                  >
+                  <button onClick={() => handleFilterChange({ activeOnly: false, page: 1 })} className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${!filters.activeOnly ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
                     הצג הכל
                   </button>
                 </div>
