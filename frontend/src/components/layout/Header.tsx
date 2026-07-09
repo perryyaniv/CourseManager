@@ -106,9 +106,7 @@ export default function Header() {
             {/* Left: logo (pushed to end) */}
             <div className="mr-auto z-10">
               <Link to="/">
-                <div className="bg-white rounded-md px-2 py-1">
-                  <img src="/logo.png" alt="לוגו" className="h-8 w-auto" />
-                </div>
+                <img src="/logo.png" alt="לוגו" className="h-6 w-auto opacity-70 hover:opacity-90 transition-opacity" />
               </Link>
             </div>
 
