@@ -61,7 +61,7 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
                 <div className="flex items-center gap-2">
                   {(course.checklistTotal ?? 0) > 0 && (
                     course.checklistIncomplete
-                      ? <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                      ? <svg className="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" strokeWidth={2} /></svg>
                       : <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                   )}
                   <span className="font-medium text-gray-900">{course.name?.name ?? '—'}</span>
