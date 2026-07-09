@@ -38,6 +38,7 @@ export default function Dashboard() {
   const isCoordinator = user?.role === 'coordinator' || user?.role === 'admin';
 
   const [view, setView] = useState<'cards' | 'table'>('table');
+  const [displayOpen, setDisplayOpen] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [allCourses, setAllCourses] = useState<Course[]>([]); // for KPI
   const [total, setTotal] = useState(0);
@@ -117,7 +118,7 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Toolbar: filter + view toggle + show all */}
+      {/* Toolbar: filter + display (collapsed) */}
       <div className="flex items-center gap-2 flex-wrap">
         <CourseFiltersPanel
           filters={filters}
@@ -125,24 +126,64 @@ export default function Dashboard() {
           lecturers={lecturers}
           academicYears={academicYears}
         />
-        <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
-          <button onClick={() => setView('cards')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
-            {t('courses.cardsView')}
+
+        {/* Display collapsed button */}
+        <div>
+          <button
+            onClick={() => setDisplayOpen((o) => !o)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+              displayOpen
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            תצוגה
+            {!filters.activeOnly && (
+              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${displayOpen ? 'bg-white text-primary' : 'bg-primary/10 text-primary'}`}>
+                הכל
+              </span>
+            )}
+            <svg className={`w-3.5 h-3.5 transition-transform ${displayOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </button>
-          <button onClick={() => setView('table')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'table' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
-            {t('courses.tableView')}
-          </button>
+
+          {displayOpen && (
+            <div className="mt-2 card p-4 space-y-3 absolute z-10 bg-white min-w-[200px]">
+              <div>
+                <p className="label mb-2">סוג תצוגה</p>
+                <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+                  <button onClick={() => setView('table')} className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${view === 'table' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
+                    {t('courses.tableView')}
+                  </button>
+                  <button onClick={() => setView('cards')} className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
+                    {t('courses.cardsView')}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <p className="label mb-2">סינון לפי סיום</p>
+                <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+                  <button
+                    onClick={() => handleFilterChange({ activeOnly: true, page: 1 })}
+                    className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${filters.activeOnly ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+                  >
+                    פעילים בלבד
+                  </button>
+                  <button
+                    onClick={() => handleFilterChange({ activeOnly: false, page: 1 })}
+                    className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${!filters.activeOnly ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+                  >
+                    הצג הכל
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        <button
-          onClick={() => handleFilterChange({ activeOnly: !filters.activeOnly, page: 1 })}
-          className={`text-xs font-medium px-3 py-1.5 rounded-md border transition-colors ${
-            filters.activeOnly
-              ? 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary'
-              : 'bg-primary/10 text-primary border-primary/20'
-          }`}
-        >
-          {filters.activeOnly ? '+ הצג הכל' : '— הסתר שהסתיימו'}
-        </button>
       </div>
 
       {/* Course list */}
