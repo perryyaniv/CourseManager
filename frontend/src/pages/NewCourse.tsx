@@ -21,14 +21,7 @@ export default function NewCourse() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/courses')} className="text-gray-400 hover:text-gray-600">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900">{t('nav.addCourse')}</h1>
-      </div>
+      <h1 className="text-xl font-bold text-dark">{t('nav.addCourse')}</h1>
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <CourseForm onSubmit={handleSubmit} onCancel={() => navigate('/courses')} loading={loading} wizard />
       </div>
