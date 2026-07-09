@@ -59,8 +59,10 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
             >
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  {course.checklistIncomplete && (
-                    <span className="text-xs font-semibold bg-red-100 text-red-600 border border-red-300 px-1.5 py-0.5 rounded-full flex-shrink-0">!</span>
+                  {(course.checklistTotal ?? 0) > 0 && (
+                    course.checklistIncomplete
+                      ? <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                      : <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                   )}
                   <span className="font-medium text-gray-900">{course.name?.name ?? '—'}</span>
                   {course.catalogueId && <span className="text-gray-400 text-xs">({course.catalogueId})</span>}
