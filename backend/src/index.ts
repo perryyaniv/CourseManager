@@ -24,6 +24,8 @@ app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173', cred
 app.use(express.json());
 app.set('io', io);
 
+app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
