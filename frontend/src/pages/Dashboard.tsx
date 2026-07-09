@@ -11,21 +11,22 @@ import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 import { useAuth } from '../contexts/AuthContext';
 
-type CardColor = 'blue' | 'teal' | 'red';
+type CardColor = 'gray' | 'green' | 'blue' | 'red';
 
-const colorMap: Record<CardColor, { bg: string; text: string; border: string }> = {
-  blue: { bg: 'bg-primary/10',   text: 'text-primary',   border: 'border-primary/20' },
-  teal: { bg: 'bg-green-50',     text: 'text-green-600', border: 'border-green-200' },
-  red:  { bg: 'bg-red-50',       text: 'text-red-600',   border: 'border-red-200' },
+const colorMap: Record<CardColor, { border: string; num: string; icon: string }> = {
+  gray:  { border: 'border-r-gray-300',   num: 'text-gray-700',   icon: 'text-gray-400' },
+  green: { border: 'border-r-green-400',  num: 'text-green-700',  icon: 'text-green-400' },
+  blue:  { border: 'border-r-primary',    num: 'text-primary',    icon: 'text-primary/50' },
+  red:   { border: 'border-r-red-400',    num: 'text-red-600',    icon: 'text-red-300' },
 };
 
-function StatCard({ label, value, icon, color = 'blue' }: { label: string; value: number; icon: React.ReactNode; color?: CardColor }) {
-  const { bg, text, border } = colorMap[color];
+function StatCard({ label, value, icon, color = 'gray' }: { label: string; value: number; icon: React.ReactNode; color?: CardColor }) {
+  const { border, num, icon: iconCls } = colorMap[color];
   return (
-    <div className={`flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl border ${border} ${bg} text-center`}>
-      <div className={`${text} opacity-80`}>{icon}</div>
-      <p className={`text-2xl font-bold leading-none ${text}`}>{value}</p>
-      <p className="text-xs text-gray-500 font-medium leading-tight">{label}</p>
+    <div className={`bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-3 flex flex-col gap-1`}>
+      <div className={`${iconCls}`}>{icon}</div>
+      <p className={`text-xl font-bold leading-none ${num}`}>{value}</p>
+      <p className="text-[11px] text-gray-400 font-medium leading-tight">{label}</p>
     </div>
   );
 }
@@ -41,7 +42,7 @@ export default function Dashboard() {
   const [displayOpen, setDisplayOpen] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [allCourses, setAllCourses] = useState<Course[]>([]); // for KPI
-  const [total, setTotal] = useState(0);
+  const [_total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [lecturers, setLecturers] = useState<Lecturer[]>([]);
@@ -94,7 +95,8 @@ export default function Dashboard() {
     setAllCourses((prev) => prev.map((x) => x._id === updated._id ? { ...x, ...updated } : x));
   };
 
-  // KPI from all courses
+  // KPI from all courses (unfiltered)
+  const totalAll = allCourses.length;
   const active = allCourses.filter((c) => c.status === 'פעיל').length;
   const upcoming = allCourses.filter((c) => c.status === 'בתכנון').length;
   const incomplete = allCourses.filter((c) => c.checklistIncomplete).length;
@@ -104,16 +106,19 @@ export default function Dashboard() {
       {/* Header */}
       <h1 className="text-xl font-bold text-dark">{t('nav.courses')}</h1>
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <StatCard label={t('dashboard.activeCourses')} value={active} color="teal"
-          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>}
+      {/* KPI cards — 4 cols, subtle colors */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        <StatCard label="סה״כ קורסים" value={totalAll} color="gray"
+          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>}
+        />
+        <StatCard label={t('dashboard.activeCourses')} value={active} color="green"
+          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
         <StatCard label={t('dashboard.upcomingCourses')} value={upcoming} color="blue"
           icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
         />
         <StatCard label={t('dashboard.incompleteCourses')} value={incomplete} color="red"
-          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>}
+          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>}
         />
       </div>
 
@@ -205,7 +210,6 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          <p className="text-xs text-gray-400">{total} קורסים</p>
           {view === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {courses.map((c) => (
