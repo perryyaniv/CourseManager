@@ -111,4 +111,5 @@ export interface CourseFilters {
   limit: number;
   sortBy?: string;
   sortDir?: 'asc' | 'desc';
+  activeOnly?: boolean;
 }

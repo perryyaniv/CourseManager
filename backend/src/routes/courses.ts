@@ -17,11 +17,12 @@ const POPULATE = [
 ];
 
 router.get('/', async (req: AuthRequest, res: Response) => {
-  const { academicYear, status, lecturer, startDateFrom, startDateTo, search, page = '1', limit = '25', sortBy = 'startDate', sortDir = 'desc' } = req.query as Record<string, string>;
+  const { academicYear, status, lecturer, startDateFrom, startDateTo, search, page = '1', limit = '25', sortBy = 'startDate', sortDir = 'desc', activeOnly } = req.query as Record<string, string>;
 
   const query: Record<string, unknown> = {};
   if (academicYear) query.academicYear = academicYear;
   if (status) query.status = status;
+  else if (activeOnly === 'true') query.status = { $in: ['פעיל', 'בתכנון'] };
   if (lecturer) query.lecturers = lecturer;
   if (startDateFrom || startDateTo) {
     const dateRange: Record<string, Date> = {};
@@ -53,7 +54,68 @@ router.get('/', async (req: AuthRequest, res: Response) => {
   const STATUS_PRIORITY: Record<string, number> = { 'פעיל': 1, 'בתכנון': 2, 'הושלם': 3, 'בוטל': 4 };
 
   let courses;
-  if (sortBy === 'statusPriority') {
+  if (sortBy === 'checklistPriority') {
+    // Sort: incomplete checklist first → active → planning → rest; all by JS after computing flags
+    const allItems = await ChecklistItem.find({ active: true }).select('_id applicableStatuses').lean();
+    const allIds = await Course.find(query).select('_id status').lean();
+    const checkedStates = await ChecklistState.find({
+      courseId: { $in: allIds.map((c) => c._id) }, checked: true,
+    }).select('courseId itemId').lean();
+
+    const checkedByCourse = new Map<string, Set<string>>();
+    for (const s of checkedStates) {
+      const cid = s.courseId.toString();
+      if (!checkedByCourse.has(cid)) checkedByCourse.set(cid, new Set());
+      checkedByCourse.get(cid)!.add(s.itemId.toString());
+    }
+
+    const ALL_STATUSES_FB = ['בתכנון', 'פעיל', 'הושלם', 'בוטל'];
+    const incompleteSet = new Set(
+      allIds.filter((c) => {
+        const applicable = allItems.filter((i) =>
+          ((i.applicableStatuses as string[] | undefined) ?? ALL_STATUSES_FB).includes(c.status as string)
+        );
+        if (applicable.length === 0) return false;
+        const checked = checkedByCourse.get(c._id.toString()) ?? new Set<string>();
+        return applicable.some((i) => !checked.has(i._id.toString()));
+      }).map((c) => c._id.toString())
+    );
+
+    const statusOrd: Record<string, number> = { 'פעיל': 2, 'בתכנון': 3, 'הושלם': 4, 'בוטל': 5 };
+    const sorted = [...allIds].sort((a, b) => {
+      const aInc = incompleteSet.has(a._id.toString()) ? 1 : statusOrd[a.status as string] ?? 6;
+      const bInc = incompleteSet.has(b._id.toString()) ? 1 : statusOrd[b.status as string] ?? 6;
+      return aInc - bInc;
+    });
+
+    const total_ = sorted.length;
+    const pageIds = sorted.slice((pageNum - 1) * limitNum, pageNum * limitNum).map((c) => c._id);
+    const raw = await Course.find({ _id: { $in: pageIds } }).populate(POPULATE).lean();
+    const orderMap = new Map(pageIds.map((id, i) => [id.toString(), i]));
+    courses = raw.sort((a, b) => (orderMap.get(a._id.toString()) ?? 0) - (orderMap.get(b._id.toString()) ?? 0));
+
+    // Override total for this branch
+    const checklistResult = { courses, total: total_, pageNum, limitNum };
+    // Compute checklist flags inline (reuse existing logic below)
+    const courseIds2 = courses.map((c) => c._id);
+    const checkedStates2 = await ChecklistState.find({ courseId: { $in: courseIds2 }, checked: true }).select('courseId itemId').lean();
+    const checkedMap2 = new Map<string, Set<string>>();
+    for (const s of checkedStates2) {
+      const cid = s.courseId.toString();
+      if (!checkedMap2.has(cid)) checkedMap2.set(cid, new Set());
+      checkedMap2.get(cid)!.add(s.itemId.toString());
+    }
+    const result2 = courses.map((c) => {
+      const applicable = allItems.filter((i) =>
+        ((i.applicableStatuses as string[] | undefined) ?? ALL_STATUSES_FB).includes(c.status as string)
+      );
+      const applicableIds = new Set(applicable.map((i) => i._id.toString()));
+      const checkedSet = checkedMap2.get(c._id.toString()) ?? new Set<string>();
+      const done = [...applicableIds].filter((id) => checkedSet.has(id)).length;
+      return { ...c, checklistDone: done, checklistTotal: applicableIds.size, checklistIncomplete: applicableIds.size > 0 && done < applicableIds.size };
+    });
+    return res.json({ data: result2, total: total_, page: pageNum, totalPages: Math.ceil(total_ / limitNum) });
+  } else if (sortBy === 'statusPriority') {
     // Use aggregation for custom status ordering
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pipeline: any[] = [

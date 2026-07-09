@@ -2,7 +2,9 @@ import client from './client';
 import { Course, PaginatedResponse, CourseFilters } from '../types';
 
 export const getCourses = (filters: CourseFilters) =>
-  client.get<PaginatedResponse<Course>>('/courses', { params: filters }).then((r) => r.data);
+  client.get<PaginatedResponse<Course>>('/courses', {
+    params: { ...filters, activeOnly: filters.activeOnly ? 'true' : undefined },
+  }).then((r) => r.data);
 
 export const getCourse = (id: string) =>
   client.get<Course>(`/courses/${id}`).then((r) => r.data);

@@ -49,15 +49,16 @@ export default function Dashboard() {
   const [filters, setFilters] = useState<CourseFilters>({
     page: 1,
     limit: 25,
-    sortBy: 'statusPriority',
+    sortBy: 'checklistPriority',
     sortDir: 'asc',
+    activeOnly: true,
     search: searchParams.get('search') ?? undefined,
   });
 
   useEffect(() => {
     getLecturers().then(setLecturers);
     // Load all for KPI (no pagination)
-    getCourses({ page: 1, limit: 200, sortBy: 'statusPriority', sortDir: 'asc' })
+    getCourses({ page: 1, limit: 200, sortBy: 'statusPriority', sortDir: 'asc', activeOnly: false })
       .then((r) => setAllCourses(r.data));
   }, []);
 
@@ -104,6 +105,16 @@ export default function Dashboard() {
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h1 className="text-xl font-bold text-dark">{t('dashboard.title')}</h1>
         <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => handleFilterChange({ activeOnly: !filters.activeOnly, page: 1 })}
+            className={`text-xs font-medium px-3 py-1.5 rounded-md border transition-colors ${
+              filters.activeOnly
+                ? 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary'
+                : 'bg-primary/10 text-primary border-primary/20'
+            }`}
+          >
+            {filters.activeOnly ? '+ הצג הכל' : '— הסתר שהסתיימו'}
+          </button>
           <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
             <button onClick={() => setView('cards')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
               {t('courses.cardsView')}
