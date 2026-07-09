@@ -15,8 +15,7 @@ export default function Header() {
   const isCoordinator = user?.role === 'coordinator' || isAdmin;
 
   const navItems = [
-    { to: '/', label: t('nav.dashboard'), show: true },
-    { to: '/courses', label: t('nav.courses'), show: true },
+    { to: '/', label: t('nav.courses'), show: true },
     { to: '/courses/new', label: t('nav.addCourse'), show: isCoordinator },
     { to: '/audit-log', label: t('nav.auditLog'), show: isAdmin },
     { to: '/users', label: t('nav.userManagement'), show: isAdmin },

@@ -1,20 +1,22 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCourses } from '../api/courses';
-import { Course } from '../types';
-import { StatusBadge } from '../components/ui/Badge';
-import Spinner from '../components/ui/Spinner';
-import { formatDate } from '../utils/date';
-import { useAuth } from '../contexts/AuthContext';
+import { getLecturers } from '../api/managedLists';
+import { Course, CourseFilters, Lecturer } from '../types';
+import CourseCard from '../components/courses/CourseCard';
+import CourseTable from '../components/courses/CourseTable';
+import CourseFiltersPanel from '../components/courses/CourseFilters';
 import Button from '../components/ui/Button';
+import Spinner from '../components/ui/Spinner';
+import { useAuth } from '../contexts/AuthContext';
 
 type CardColor = 'blue' | 'teal' | 'red';
 
 const colorMap: Record<CardColor, { bg: string; text: string; border: string }> = {
-  blue: { bg: 'bg-primary/10',   text: 'text-primary',     border: 'border-primary/20' },
-  teal: { bg: 'bg-green-50',     text: 'text-green-600',   border: 'border-green-200' },
-  red:  { bg: 'bg-red-50',       text: 'text-red-600',     border: 'border-red-200' },
+  blue: { bg: 'bg-primary/10',   text: 'text-primary',   border: 'border-primary/20' },
+  teal: { bg: 'bg-green-50',     text: 'text-green-600', border: 'border-green-200' },
+  red:  { bg: 'bg-red-50',       text: 'text-red-600',   border: 'border-red-200' },
 };
 
 function StatCard({ label, value, icon, color = 'blue' }: { label: string; value: number; icon: React.ReactNode; color?: CardColor }) {
@@ -32,116 +34,157 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const isCoordinator = user?.role === 'coordinator' || user?.role === 'admin';
+
+  const [view, setView] = useState<'cards' | 'table'>('table');
   const [courses, setCourses] = useState<Course[]>([]);
+  const [allCourses, setAllCourses] = useState<Course[]>([]); // for KPI
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [lecturers, setLecturers] = useState<Lecturer[]>([]);
+  const [academicYears, setAcademicYears] = useState<string[]>([]);
+
+  const [filters, setFilters] = useState<CourseFilters>({
+    page: 1,
+    limit: 25,
+    sortBy: 'statusPriority',
+    sortDir: 'asc',
+    search: searchParams.get('search') ?? undefined,
+  });
 
   useEffect(() => {
-    getCourses({ page: 1, limit: 100 }).then((r) => setCourses(r.data)).finally(() => setLoading(false));
+    getLecturers().then(setLecturers);
+    // Load all for KPI (no pagination)
+    getCourses({ page: 1, limit: 200, sortBy: 'statusPriority', sortDir: 'asc' })
+      .then((r) => setAllCourses(r.data));
   }, []);
 
-  if (loading) return <Spinner />;
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await getCourses(filters);
+      setCourses(result.data);
+      setTotal(result.total);
+      setTotalPages(result.totalPages);
+      const years = [...new Set(result.data.map((c) => c.academicYear).filter(Boolean))].sort().reverse();
+      setAcademicYears((prev) => [...new Set([...prev, ...(years as string[])])]);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
 
-  const active = courses.filter((c) => c.status === 'פעיל');
-  const upcoming = courses.filter((c) => c.startDate && new Date(c.startDate) > new Date() && c.status === 'בתכנון');
-  const incomplete = courses.filter((c) => c.checklistIncomplete);
-  const recent = [...courses].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 8);
-  const statusCounts: Record<string, number> = {};
-  courses.forEach((c) => { statusCounts[c.status] = (statusCounts[c.status] ?? 0) + 1; });
+  useEffect(() => { load(); }, [load]);
+
+  const handleFilterChange = (updates: Partial<CourseFilters>) =>
+    setFilters((f) => ({ ...f, ...updates }));
+
+  const handleSort = (field: string) =>
+    setFilters((f) => ({
+      ...f,
+      sortBy: field,
+      sortDir: f.sortBy === field && f.sortDir === 'desc' ? 'asc' : 'desc',
+      page: 1,
+    }));
+
+  const handleStatusChanged = (updated: Course) => {
+    setCourses((prev) => prev.map((x) => x._id === updated._id ? { ...x, ...updated } : x));
+    setAllCourses((prev) => prev.map((x) => x._id === updated._id ? { ...x, ...updated } : x));
+  };
+
+  // KPI from all courses
+  const active = allCourses.filter((c) => c.status === 'פעיל').length;
+  const upcoming = allCourses.filter((c) => c.startDate && new Date(c.startDate) > new Date() && c.status === 'בתכנון').length;
+  const incomplete = allCourses.filter((c) => c.checklistIncomplete).length;
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <h1 className="text-xl font-bold text-dark">{t('dashboard.title')}</h1>
-        {isCoordinator && (
-          <Button onClick={() => navigate('/courses/new')} size="sm">
-            + {t('nav.addCourse')}
-          </Button>
-        )}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+            <button onClick={() => setView('cards')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
+              {t('courses.cardsView')}
+            </button>
+            <button onClick={() => setView('table')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'table' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
+              {t('courses.tableView')}
+            </button>
+          </div>
+          {isCoordinator && (
+            <Button onClick={() => navigate('/courses/new')} size="sm">+ {t('nav.addCourse')}</Button>
+          )}
+        </div>
       </div>
 
-      {/* Stat cards — always 3 columns, compact */}
+      {/* KPI cards */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <StatCard label={t('dashboard.activeCourses')} value={active.length} color="teal"
+        <StatCard label={t('dashboard.activeCourses')} value={active} color="teal"
           icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>}
         />
-        <StatCard label={t('dashboard.upcomingCourses')} value={upcoming.length} color="blue"
+        <StatCard label={t('dashboard.upcomingCourses')} value={upcoming} color="blue"
           icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
         />
-        <StatCard label={t('dashboard.incompleteCourses')} value={incomplete.length} color="red"
+        <StatCard label={t('dashboard.incompleteCourses')} value={incomplete} color="red"
           icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>}
         />
       </div>
 
-      {/* Incomplete checklist — most important, shown prominently */}
-      {incomplete.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="section-title text-red-600 mb-3">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-            {t('dashboard.incompleteCourses')} ({incomplete.length})
-          </div>
-          <div className="space-y-1">
-            {incomplete.map((c) => (
-              <Link key={c._id} to={`/courses/${c._id}`}
-                className="flex items-center justify-between py-2 px-2 rounded-md hover:bg-red-100 transition-colors group">
-                <span className="text-sm font-medium text-gray-800 group-hover:text-red-700 truncate">{c.name?.name}</span>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs text-gray-400 hidden sm:block">{formatDate(c.startDate)}</span>
-                  <StatusBadge status={c.status} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Filters */}
+      <CourseFiltersPanel
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        lecturers={lecturers}
+        academicYears={academicYears}
+      />
 
-      {/* Courses by status */}
-      <div className="card">
-        <div className="section-title">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-          {t('dashboard.coursesByStatus')}
+      {/* Course list */}
+      {loading ? (
+        <Spinner />
+      ) : courses.length === 0 ? (
+        <div className="text-center py-16">
+          <div className="w-14 h-14 bg-primary/10 rounded-2xl mx-auto mb-3 flex items-center justify-center">
+            <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <h2 className="text-base font-semibold text-gray-700 mb-1">
+            {filters.search || filters.status || filters.academicYear ? t('courses.noResults') : 'אין קורסים עדיין'}
+          </h2>
+          <p className="text-sm text-gray-400 mb-5">
+            {filters.search || filters.status || filters.academicYear ? 'נסה לשנות את הסינון' : 'הוסף את הקורס הראשון כדי להתחיל'}
+          </p>
+          {isCoordinator && !filters.search && !filters.status && !filters.academicYear && (
+            <Button onClick={() => navigate('/courses/new')} size="lg">+ הוספת קורס ראשון</Button>
+          )}
         </div>
-        {Object.keys(statusCounts).length === 0
-          ? <p className="text-sm text-gray-400 text-center py-4">{t('common.noData')}</p>
-          : <div className="space-y-2.5">
-              {Object.entries(statusCounts).map(([status, count]) => (
-                <div key={status} className="flex items-center gap-3">
-                  <StatusBadge status={status as Course['status']} />
-                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-2 bg-primary rounded-full transition-all duration-500"
-                      style={{ width: `${(count / courses.length) * 100}%` }} />
-                  </div>
-                  <span className="text-sm font-bold text-gray-700 w-5 text-left">{count}</span>
-                </div>
+      ) : (
+        <>
+          <p className="text-xs text-gray-400">{total} קורסים</p>
+          {view === 'cards' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {courses.map((c) => (
+                <CourseCard key={c._id} course={c} onStatusChanged={handleStatusChanged} />
               ))}
             </div>
-        }
-      </div>
-
-      {/* Recent courses — last */}
-      <div className="card">
-        <div className="section-title">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          {t('dashboard.recentCourses')}
-          <Link to="/courses" className="mr-auto text-xs font-normal normal-case tracking-normal text-primary hover:underline">הצג הכל</Link>
-        </div>
-        <div className="space-y-1">
-          {recent.map((c) => (
-            <Link key={c._id} to={`/courses/${c._id}`}
-              className="flex items-center justify-between py-2 px-2 rounded-md hover:bg-primary/5 transition-colors group">
-              <div className="flex items-center gap-2 min-w-0">
-                {c.checklistIncomplete && <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />}
-                <span className="text-sm font-medium text-gray-800 group-hover:text-primary truncate transition-colors">{c.name?.name}</span>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-xs text-gray-400 hidden sm:block">{formatDate(c.startDate)}</span>
-                <StatusBadge status={c.status} />
-              </div>
-            </Link>
-          ))}
-          {recent.length === 0 && <p className="text-sm text-gray-400 text-center py-4">{t('common.noData')}</p>}
-        </div>
-      </div>
+          ) : (
+            <CourseTable
+              courses={courses}
+              sortBy={filters.sortBy ?? 'statusPriority'}
+              sortDir={filters.sortDir ?? 'asc'}
+              onSort={handleSort}
+            />
+          )}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <Button variant="secondary" size="sm" disabled={filters.page <= 1} onClick={() => handleFilterChange({ page: filters.page - 1 })}>הקודם</Button>
+              <span className="text-sm text-gray-600">{filters.page} / {totalPages}</span>
+              <Button variant="secondary" size="sm" disabled={filters.page >= totalPages} onClick={() => handleFilterChange({ page: filters.page + 1 })}>הבא</Button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
