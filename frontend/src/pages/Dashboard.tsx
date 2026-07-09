@@ -39,6 +39,7 @@ export default function Dashboard() {
 
   const [view, setView] = useState<'cards' | 'table'>('table');
   const [displayOpen, setDisplayOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [allCourses, setAllCourses] = useState<Course[]>([]); // for KPI
   const [total, setTotal] = useState(0);
@@ -152,8 +153,7 @@ export default function Dashboard() {
           </button>
 
           {displayOpen && (
-            <div className="mt-2 card p-4 space-y-4 absolute z-10 bg-white min-w-[220px]">
-              {/* View type */}
+            <div className="mt-2 card p-4 space-y-3 absolute z-10 bg-white min-w-[200px]">
               <div>
                 <p className="label mb-2">סוג תצוגה</p>
                 <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
@@ -165,34 +165,6 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-
-              {/* Sort */}
-              <div>
-                <p className="label mb-2">מיון</p>
-                <div className="space-y-1">
-                  {[
-                    { key: 'checklistPriority', label: 'ברירת מחדל (צ\'קליסט → פעיל → בתכנון)' },
-                    { key: 'courseName',        label: 'שם קורס' },
-                    { key: 'statusPriority',    label: 'סטטוס' },
-                    { key: 'startDate',         label: 'תאריך התחלה' },
-                  ].map(({ key, label }) => (
-                    <button
-                      key={key}
-                      onClick={() => handleFilterChange({ sortBy: key, sortDir: key === 'startDate' ? 'desc' : 'asc', page: 1 })}
-                      className={`w-full text-right px-3 py-2 rounded-md text-sm transition-colors ${
-                        filters.sortBy === key
-                          ? 'bg-primary/10 text-primary font-semibold'
-                          : 'text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      {filters.sortBy === key && <span className="ml-1">✓</span>}
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Show completed */}
               <div>
                 <p className="label mb-2">קורסים מוצגים</p>
                 <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
@@ -204,6 +176,60 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Sort panel */}
+        <div>
+          <button
+            onClick={() => setSortOpen((o) => !o)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+              sortOpen || filters.sortBy !== 'checklistPriority'
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+            מיון
+            {filters.sortBy !== 'checklistPriority' && (
+              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${sortOpen ? 'bg-white text-primary' : 'bg-white text-primary'}`}>
+                ✓
+              </span>
+            )}
+            <svg className={`w-3.5 h-3.5 transition-transform ${sortOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {sortOpen && (
+            <div className="mt-2 card p-3 absolute z-10 bg-white min-w-[240px]">
+              {[
+                { key: 'checklistPriority', label: 'ברירת מחדל',   sub: 'צ\'קליסט → פעיל → בתכנון' },
+                { key: 'courseName',        label: 'שם קורס',       sub: 'א–ת' },
+                { key: 'statusPriority',    label: 'סטטוס',         sub: 'פעיל → בתכנון → הושלם → בוטל' },
+                { key: 'startDate',         label: 'תאריך התחלה',   sub: 'חדש לישן' },
+              ].map(({ key, label, sub }) => (
+                <button
+                  key={key}
+                  onClick={() => { handleFilterChange({ sortBy: key, sortDir: key === 'startDate' ? 'desc' : 'asc', page: 1 }); setSortOpen(false); }}
+                  className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-md transition-colors ${
+                    filters.sortBy === key ? 'bg-primary/10 text-primary' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <div>
+                    <p className={`text-sm font-medium ${filters.sortBy === key ? 'text-primary' : ''}`}>{label}</p>
+                    <p className="text-xs text-gray-400">{sub}</p>
+                  </div>
+                  {filters.sortBy === key && (
+                    <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              ))}
             </div>
           )}
         </div>
