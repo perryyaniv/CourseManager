@@ -129,7 +129,7 @@ export default function Dashboard() {
         />
 
         {/* Display collapsed button */}
-        <div>
+        <div className="relative">
           <button
             onClick={() => setDisplayOpen((o) => !o)}
             className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
@@ -153,7 +153,9 @@ export default function Dashboard() {
           </button>
 
           {displayOpen && (
-            <div className="mt-2 card p-4 space-y-3 absolute z-10 bg-white min-w-[200px]">
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setDisplayOpen(false)} />
+              <div className="absolute top-full mt-2 right-0 z-20 card p-4 space-y-3 bg-white min-w-[200px] shadow-lg">
               <div>
                 <p className="label mb-2">סוג תצוגה</p>
                 <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
@@ -177,11 +179,12 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
+            </>
           )}
         </div>
 
         {/* Sort panel */}
-        <div>
+        <div className="relative">
           <button
             onClick={() => setSortOpen((o) => !o)}
             className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
@@ -205,7 +208,9 @@ export default function Dashboard() {
           </button>
 
           {sortOpen && (
-            <div className="mt-2 card p-3 absolute z-10 bg-white min-w-[240px]">
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setSortOpen(false)} />
+              <div className="absolute top-full mt-2 right-0 z-20 card p-3 bg-white min-w-[240px] shadow-lg">
               {[
                 { key: 'checklistPriority', label: 'ברירת מחדל',   sub: 'צ\'קליסט → פעיל → בתכנון' },
                 { key: 'courseName',        label: 'שם קורס',       sub: 'א–ת' },
@@ -231,6 +236,7 @@ export default function Dashboard() {
                 </button>
               ))}
             </div>
+            </>
           )}
         </div>
       </div>
