@@ -72,14 +72,14 @@ export default function CourseTable({ courses, sortBy, sortDir, onSort }: Props)
               <td className="px-4 py-3"><StatusBadge status={course.status} /></td>
               <td className="px-4 py-3 hidden sm:table-cell">
                 {(course.checklistTotal ?? 0) > 0 ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="flex items-center gap-2 min-w-[80px]">
+                    <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
-                        className={`h-1.5 rounded-full ${course.checklistIncomplete ? 'bg-red-400' : 'bg-green-500'}`}
+                        className={`h-1.5 rounded-full transition-all ${course.checklistIncomplete ? 'bg-red-400' : 'bg-green-500'}`}
                         style={{ width: `${Math.round(((course.checklistDone ?? 0) / (course.checklistTotal ?? 1)) * 100)}%` }}
                       />
                     </div>
-                    <span className={`text-xs font-medium ${course.checklistIncomplete ? 'text-red-500' : 'text-green-600'}`}>
+                    <span className={`text-xs font-medium tabular-nums flex-shrink-0 ${course.checklistIncomplete ? 'text-red-500' : 'text-green-600'}`}>
                       {course.checklistDone}/{course.checklistTotal}
                     </span>
                   </div>
