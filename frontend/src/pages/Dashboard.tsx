@@ -102,32 +102,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h1 className="text-xl font-bold text-dark">{t('dashboard.title')}</h1>
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => handleFilterChange({ activeOnly: !filters.activeOnly, page: 1 })}
-            className={`text-xs font-medium px-3 py-1.5 rounded-md border transition-colors ${
-              filters.activeOnly
-                ? 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary'
-                : 'bg-primary/10 text-primary border-primary/20'
-            }`}
-          >
-            {filters.activeOnly ? '+ הצג הכל' : '— הסתר שהסתיימו'}
-          </button>
-          <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
-            <button onClick={() => setView('cards')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
-              {t('courses.cardsView')}
-            </button>
-            <button onClick={() => setView('table')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'table' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
-              {t('courses.tableView')}
-            </button>
-          </div>
-          {isCoordinator && (
-            <Button onClick={() => navigate('/courses/new')} size="sm">+ {t('nav.addCourse')}</Button>
-          )}
-        </div>
-      </div>
+      <h1 className="text-xl font-bold text-dark">{t('dashboard.title')}</h1>
 
       {/* KPI cards */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
@@ -142,13 +117,33 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Filters */}
-      <CourseFiltersPanel
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        lecturers={lecturers}
-        academicYears={academicYears}
-      />
+      {/* Toolbar: filter + view toggle + show all */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <CourseFiltersPanel
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          lecturers={lecturers}
+          academicYears={academicYears}
+        />
+        <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+          <button onClick={() => setView('cards')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
+            {t('courses.cardsView')}
+          </button>
+          <button onClick={() => setView('table')} className={`px-3 py-1.5 text-sm transition-colors ${view === 'table' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
+            {t('courses.tableView')}
+          </button>
+        </div>
+        <button
+          onClick={() => handleFilterChange({ activeOnly: !filters.activeOnly, page: 1 })}
+          className={`text-xs font-medium px-3 py-1.5 rounded-md border transition-colors ${
+            filters.activeOnly
+              ? 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary'
+              : 'bg-primary/10 text-primary border-primary/20'
+          }`}
+        >
+          {filters.activeOnly ? '+ הצג הכל' : '— הסתר שהסתיימו'}
+        </button>
+      </div>
 
       {/* Course list */}
       {loading ? (
