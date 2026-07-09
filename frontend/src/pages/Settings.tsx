@@ -353,7 +353,6 @@ export default function Settings() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold text-dark">{t('settings.title')}</h1>
 
       <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-2">
         {tabs.map((tab) => (

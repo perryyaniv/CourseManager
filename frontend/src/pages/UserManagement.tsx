@@ -71,7 +71,6 @@ export default function UserManagement() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-dark">{t('users.title')}</h1>
         <Button size="sm" onClick={() => setAddModal(true)}>+ {t('users.addUser')}</Button>
       </div>
 

@@ -103,8 +103,6 @@ export default function Dashboard() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <h1 className="text-xl font-bold text-dark">{t('nav.courses')}</h1>
-
       {/* KPI cards — always single row */}
       <div className="grid grid-cols-4 gap-2">
         <StatCard label="סה״כ" value={totalAll} color="gray" />

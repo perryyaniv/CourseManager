@@ -65,7 +65,6 @@ export default function AuditLog() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold text-dark">{t('auditLog.title')}</h1>
 
       <form onSubmit={handleSearch} className="flex gap-2">
         <input
