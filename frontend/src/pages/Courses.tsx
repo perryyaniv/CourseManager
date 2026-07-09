@@ -27,8 +27,8 @@ export default function Courses() {
   const [filters, setFilters] = useState<CourseFilters>({
     page: 1,
     limit: 25,
-    sortBy: 'startDate',
-    sortDir: 'desc',
+    sortBy: 'statusPriority',
+    sortDir: 'asc',
     search: searchParams.get('search') ?? undefined,
   });
 

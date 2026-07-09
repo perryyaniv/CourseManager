@@ -49,13 +49,33 @@ router.get('/', async (req: AuthRequest, res: Response) => {
   const pageNum = Math.max(1, parseInt(page));
   const limitNum = Math.min(100, parseInt(limit));
   const sortOrder = sortDir === 'asc' ? 1 : -1;
-  const sortField = sortBy === 'courseName' ? 'name' : sortBy;
 
-  const courses = await courseQuery
-    .sort({ [sortField]: sortOrder })
-    .skip((pageNum - 1) * limitNum)
-    .limit(limitNum)
-    .lean();
+  const STATUS_PRIORITY: Record<string, number> = { 'פעיל': 1, 'בתכנון': 2, 'הושלם': 3, 'בוטל': 4 };
+
+  let courses;
+  if (sortBy === 'statusPriority') {
+    // Use aggregation for custom status ordering
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pipeline: any[] = [
+      { $match: query },
+      { $addFields: { _statusOrder: { $switch: {
+        branches: Object.entries(STATUS_PRIORITY).map(([s, v]) => ({ case: { $eq: ['$status', s] }, then: v })),
+        default: 5,
+      }}}},
+      { $sort: { _statusOrder: 1, startDate: -1 } },
+      { $skip: (pageNum - 1) * limitNum },
+      { $limit: limitNum },
+    ];
+    const raw = await Course.aggregate(pipeline);
+    courses = await Course.populate(raw, POPULATE);
+  } else {
+    const sortField = sortBy === 'courseName' ? 'name' : sortBy;
+    courses = await courseQuery
+      .sort({ [sortField]: sortOrder })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .lean();
+  }
 
   // Attach checklist progress per course, counting only items applicable to each course's status
   const ALL_STATUSES = ['בתכנון', 'פעיל', 'הושלם', 'בוטל'];
