@@ -3,6 +3,7 @@ import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import ChecklistItem from '../models/ChecklistItem';
 import ChecklistState from '../models/ChecklistState';
 import Course from '../models/Course';
+import { logAudit } from '../utils/auditLogger';
 
 const router = Router();
 router.use(authenticate);
@@ -80,6 +81,15 @@ router.patch('/course/:courseId/:itemId', requireRole('admin', 'coordinator'), a
     { $set: update },
     { upsert: true, new: true }
   );
+
+  const item = await ChecklistItem.findById(req.params.itemId).select('label').lean();
+  await logAudit({
+    userId: req.user!.userId,
+    userName: req.user!.username,
+    courseId: req.params.courseId,
+    action: checked ? `סימן כהושלם: ${item?.label ?? req.params.itemId}` : `ביטל סימון: ${item?.label ?? req.params.itemId}`,
+  });
+
   res.json({ message: 'Updated' });
 });
 
