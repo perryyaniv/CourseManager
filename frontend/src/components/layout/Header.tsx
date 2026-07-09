@@ -103,12 +103,8 @@ export default function Header() {
               <span className="text-white font-bold text-base">{pageTitle}</span>
             </div>
 
-            {/* Left: logo (pushed to end) */}
-            <div className="mr-auto z-10">
-              <Link to="/">
-                <img src="/logo.png" alt="לוגו" className="h-6 w-auto opacity-70 hover:opacity-90 transition-opacity" />
-              </Link>
-            </div>
+            {/* Left: spacer to balance the right side */}
+            <div className="mr-auto z-10" />
 
           </div>
         </div>
