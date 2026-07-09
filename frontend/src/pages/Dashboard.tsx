@@ -97,7 +97,7 @@ export default function Dashboard() {
 
   // KPI from all courses
   const active = allCourses.filter((c) => c.status === 'פעיל').length;
-  const upcoming = allCourses.filter((c) => c.startDate && new Date(c.startDate) > new Date() && c.status === 'בתכנון').length;
+  const upcoming = allCourses.filter((c) => c.status === 'בתכנון').length;
   const incomplete = allCourses.filter((c) => c.checklistIncomplete).length;
 
   return (
