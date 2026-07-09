@@ -58,17 +58,15 @@ export default function Dashboard() {
 
   useEffect(() => {
     getLecturers().then(setLecturers);
+    getCourses({ page: 1, limit: 500, sortBy: 'statusPriority', sortDir: 'asc' })
+      .then((r) => setAllCourses(r.data));
   }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [result, allResult] = await Promise.all([
-        getCourses(filters),
-        getCourses({ ...filters, page: 1, limit: 500 }),
-      ]);
+      const result = await getCourses(filters);
       setCourses(result.data);
-      setAllCourses(allResult.data);
       setTotal(result.total);
       setTotalPages(result.totalPages);
       const years = [...new Set(result.data.map((c) => c.academicYear).filter(Boolean))].sort().reverse();
