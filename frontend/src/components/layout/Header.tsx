@@ -55,11 +55,11 @@ export default function Header() {
     <>
       <header className="sticky top-0 z-40 shadow-nav">
         <div className="bg-primary px-4 sm:px-6">
-          {/* 3-column layout: [right: hamburger] [center: title] [left: logo] */}
-          <div className="max-w-7xl mx-auto flex items-center h-14">
+          {/* Layout: right/left as flex, title absolutely centered */}
+          <div className="max-w-7xl mx-auto relative flex items-center h-14">
 
             {/* Right: hamburger (mobile) / nav (desktop) */}
-            <div className="flex items-center gap-1 flex-none">
+            <div className="flex items-center gap-1 flex-none z-10">
               <button
                 className="p-2 rounded-md text-white/80 hover:text-white hover:bg-white/10"
                 onClick={() => setDrawerOpen((o) => !o)}
@@ -98,13 +98,13 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Center: current page title */}
-            <div className="flex-1 text-center">
+            {/* Center: absolutely positioned so it's truly centered regardless of side widths */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <span className="text-white font-bold text-base">{pageTitle}</span>
             </div>
 
-            {/* Left: logo */}
-            <div className="flex-none">
+            {/* Left: logo (pushed to end) */}
+            <div className="mr-auto z-10">
               <Link to="/">
                 <div className="bg-white rounded-md px-2 py-1">
                   <img src="/logo.png" alt="לוגו" className="h-8 w-auto" />
